@@ -1,0 +1,203 @@
+@import url('https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&display=swap');
+
+:root {
+    --color-body: #2b2b2b;
+    --color-heading: #1e1e1e;
+    --color-base: #ffffff;
+    --color-base2: #f8f9fa;
+    --color-brand: #4CAF50;
+    --color-brand2: #45a049;
+    --font-base: "Bai Jamjuree";
+}
+
+body {
+    background-color: var(--color-base2);
+    color: var(--color-body);
+    font-family: var(--font-base), sans-serif;
+    line-height: 1.7;
+}
+
+h1,h2,h3,h4,h5,h6 {
+    color: var(--color-heading);
+    font-weight: 700;
+}
+
+a {
+    text-decoration: none;
+    color: var(--color-body);
+    transition: all 0.4s ease;
+}
+
+a:hover {
+    color: var(--color-brand);
+}
+
+img {
+    width: 100%;
+    height: auto;
+}
+
+.text-brand {
+    color: var(--color-brand);
+}
+
+.bg-base {
+    background-color: var(--color-base);
+}
+
+.shadow-effect {
+    transition: all 0.5s;
+}
+
+.shadow-effect:hover {
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+
+.full-height {
+    min-height: 100vh;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 80px;
+    padding-bottom: 80px;
+}
+
+/* NAVBAR */
+.navbar {
+    background-color: var(--color-base);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.navbar .nav-link {
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--color-body);
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link.active {
+    color: var(--color-brand);
+}
+
+/* BUTTONS */
+.btn {
+    padding: 12px 28px;
+    font-weight: 700;
+}
+
+.btn-brand {
+    background-color: var(--color-brand);
+    border-color: var(--color-brand);
+    color: var(--color-base);
+}
+
+.btn-brand:hover,
+.btn-brand:focus {
+    background-color: var(--color-brand2);
+    color: var(--color-base);
+    border-color: var(--color-brand2);
+}
+
+/* CARD */
+.card-custom {
+    background-color: var(--color-base);
+    border: none;
+    border-radius: 10px;
+}
+
+.card-custom .card-custom-image {
+    overflow: hidden;
+    height: 250px;
+}
+
+.card-custom .card-custom-image img {
+    transition: all 0.4s ease;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card-custom:hover .card-custom-image img {
+    transform: scale(1.1);
+}
+
+/* FORMS */
+.form-control {
+    border: 1px solid #dce1e4;
+    padding: 12px 16px;
+}
+
+.form-control:focus {
+    border-color: var(--color-brand);
+    box-shadow: none;
+}
+
+/* SEARCH FORM */
+.search-form {
+    background: var(--color-base);
+    padding: 32px;
+    border-radius: 10px;
+}
+
+/* BADGES */
+.badge {
+    padding: 8px 16px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* FOOTER */
+footer {
+    background-color: var(--color-base);
+    padding: 40px 0;
+}
+
+.social-icons a {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-base2);
+    border-radius: 100px;
+    font-size: 24px;
+    margin-left: 10px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 991.98px) {
+    .navbar {
+        background: var(--color-base);
+        padding: 12px 0;
+    }
+
+    .navbar-brand img {
+        height: 40px;
+    }
+
+    .navbar .nav-link {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+}
+
+/* UTILITY CLASSES */
+.link-custom {
+    font-weight: 700;
+    position: relative;
+}
+
+.link-custom::after {
+    content: "";
+    width: 0%;
+    height: 2px;
+    background-color: var(--color-brand);
+    position: absolute;
+    left: 0;
+    top: 110%;
+    transition: all 0.4s;
+}
+
+.link-custom:hover::after {
+    width: 100%;
+}
