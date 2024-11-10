@@ -1,5 +1,7 @@
+/* Importing Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&display=swap');
 
+/* Root Variables */
 :root {
     --color-body: #2b2b2b;
     --color-heading: #1e1e1e;
@@ -10,6 +12,7 @@
     --font-base: "Bai Jamjuree";
 }
 
+/* General Body and Text Styling */
 body {
     background-color: var(--color-base2);
     color: var(--color-body);
@@ -17,42 +20,45 @@ body {
     line-height: 1.7;
 }
 
+/* Heading Styling */
 h1,h2,h3,h4,h5,h6 {
     color: var(--color-heading);
     font-weight: 700;
 }
 
+/* Link Styling */
 a {
     text-decoration: none;
     color: var(--color-body);
     transition: all 0.4s ease;
 }
-
 a:hover {
     color: var(--color-brand);
 }
 
+/* Image Styling */
 img {
     width: 100%;
     height: auto;
 }
 
+/* Text Colors and Backgrounds */
 .text-brand {
     color: var(--color-brand);
 }
-
 .bg-base {
     background-color: var(--color-base);
 }
 
+/* Shadow Effects */
 .shadow-effect {
     transition: all 0.5s;
 }
-
 .shadow-effect:hover {
     box-shadow: 0 8px 16px rgba(0,0,0,0.1);
 }
 
+/* Full Height Utility */
 .full-height {
     min-height: 100vh;
     height: 100%;
@@ -63,35 +69,31 @@ img {
     padding-bottom: 80px;
 }
 
-/* NAVBAR */
+/* Navbar Styling */
 .navbar {
     background-color: var(--color-base);
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
-
 .navbar .nav-link {
     font-weight: 700;
     text-transform: uppercase;
     color: var(--color-body);
 }
-
 .navbar .nav-link:hover,
 .navbar .nav-link.active {
     color: var(--color-brand);
 }
 
-/* BUTTONS */
+/* Button Styling */
 .btn {
     padding: 12px 28px;
     font-weight: 700;
 }
-
 .btn-brand {
     background-color: var(--color-brand);
     border-color: var(--color-brand);
     color: var(--color-base);
 }
-
 .btn-brand:hover,
 .btn-brand:focus {
     background-color: var(--color-brand2);
@@ -99,105 +101,149 @@ img {
     border-color: var(--color-brand2);
 }
 
-/* CARD */
+/* Card Styling */
 .card-custom {
     background-color: var(--color-base);
     border: none;
     border-radius: 10px;
 }
-
 .card-custom .card-custom-image {
     overflow: hidden;
     height: 250px;
 }
-
 .card-custom .card-custom-image img {
     transition: all 0.4s ease;
     height: 100%;
     object-fit: cover;
 }
-
 .card-custom:hover .card-custom-image img {
     transform: scale(1.1);
 }
 
-/* FORMS */
+/* Form Controls */
 .form-control {
+    background-color: var(--color-base2);
     border: 1px solid #dce1e4;
     padding: 12px 16px;
+    border-radius: 5px;
+}
+.form-control:focus {
+    background-color: var(--color-base2);
+    border-color: var(--color-brand);
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.25);
 }
 
-.form-control:focus {
+/* Search Form Styles */
+.search-form {
+    background-color: var(--color-base);
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.search-form .form-control-lg {
+    border: 1px solid #dce1e4;
+    padding: 1rem 1.5rem;
+}
+.search-form .btn-brand {
+    padding: 0.8rem 2rem;
+}
+
+/* Filter Sidebar */
+.filters-section {
+    position: sticky;
+    top: 20px;
+}
+
+/* Form Elements */
+.form-select {
+    border: 1px solid #dce1e4;
+    padding: 0.75rem 1rem;
+}
+.form-select:focus {
     border-color: var(--color-brand);
     box-shadow: none;
 }
 
-/* SEARCH FORM */
-.search-form {
-    background: var(--color-base);
-    padding: 32px;
-    border-radius: 10px;
+/* Badge Customization */
+.badge.bg-success {
+    background-color: var(--color-brand) !important;
+}
+.badge.bg-secondary {
+    background-color: #6c757d !important;
 }
 
-/* BADGES */
-.badge {
-    padding: 8px 16px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
+/* Pagination Customization */
+.pagination .page-link {
+    color: var(--color-brand);
+    padding: 0.75rem 1rem;
+}
+.pagination .page-item.active .page-link {
+    background-color: var(--color-brand);
+    border-color: var(--color-brand);
+    color: var(--color-base);
+}
+.pagination .page-link:focus {
+    box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
 }
 
-/* FOOTER */
-footer {
-    background-color: var(--color-base);
-    padding: 40px 0;
-}
-
-.social-icons a {
-    width: 40px;
-    height: 40px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background-color: var(--color-base2);
-    border-radius: 100px;
-    font-size: 24px;
-    margin-left: 10px;
-}
-
-/* RESPONSIVE */
+/* Responsive Adjustments */
 @media (max-width: 991.98px) {
     .navbar {
-        background: var(--color-base);
         padding: 12px 0;
     }
-
-    .navbar-brand img {
-        height: 40px;
-    }
-
     .navbar .nav-link {
         font-size: 14px;
         padding: 8px 16px;
     }
+    .filters-section {
+        position: static;
+        margin-bottom: 2rem;
+    }
+    .search-form {
+        padding: 1.5rem;
+    }
+}
+@media (max-width: 767.98px) {
+    .registration-card, .login-card {
+        padding: 2rem !important;
+    }
+    .card-custom-image {
+        height: 200px;
+    }
+}
+@media (max-width: 575.98px) {
+    .login-card, .registration-card {
+        padding: 2rem !important;
+    }
 }
 
-/* UTILITY CLASSES */
-.link-custom {
-    font-weight: 700;
-    position: relative;
+/* Sort Dropdown Customization */
+.sort-select {
+    width: auto;
+    min-width: 200px;
 }
 
-.link-custom::after {
-    content: "";
-    width: 0%;
-    height: 2px;
-    background-color: var(--color-brand);
-    position: absolute;
-    left: 0;
-    top: 110%;
-    transition: all 0.4s;
+/* Results Count Style */
+.results-count {
+    color: var(--color-body);
+    font-size: 0.9rem;
 }
 
-.link-custom:hover::after {
-    width: 100%;
+/* Year Range Inputs */
+.year-range {
+    display: flex;
+    gap: 1rem;
+}
+.year-range .form-control {
+    width: 100px;
+}
+
+/* Clear Filters Button */
+.btn-light {
+    background-color: var(--color-base2);
+    border: none;
+    font-weight: 500;
+}
+.btn-light:hover {
+    background-color: #e9ecef;
 }

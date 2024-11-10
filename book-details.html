@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Details - Library System</title>
+    <link rel="stylesheet" href="./assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./assets/css/line-awesome.min.css" />
+    <link rel="stylesheet" href="./assets/css/style.css" />
+</head>
+<body>
+    <!-- Navbar (same as main page) -->
+    
+    <div id="content-wrapper">
+        <section class="full-height px-lg-5">
+            <div class="container">
+                <div class="row gy-4 mt-5">
+                    <div class="col-lg-4" data-aos="fade-up">
+                        <div class="card-custom rounded-4 bg-base shadow-effect">
+                            <div class="card-custom-image rounded-4">
+                                <img src="/assets/images/book-cover.jpg" class="rounded-4" alt="Book Cover">
+                            </div>
+                            <div class="p-4 text-center">
+                                <span class="badge bg-success mb-3">Available</span>
+                                <button class="btn btn-brand w-100">Reserve Now</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-8" data-aos="fade-up" data-aos-delay="300">
+                        <h1 class="display-4 fw-bold">Book Title</h1>
+                        <p class="text-brand mb-2">Author Name</p>
+                        <div class="mb-4">
+                            <span class="badge bg-light text-dark me-2">Genre</span>
+                            <span class="badge bg-light text-dark me-2">Year</span>
+                            <span class="badge bg-light text-dark">ISBN</span>
+                        </div>
+                        <h5 class="mb-3">Description</h5>
+                        <p class="lead">Book description goes here...</p>
+                        
+                        <div class="mt-5">
+                            <h5 class="mb-3">Available Copies</h5>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Library Location</th>
+                                            <th>Status</th>
+                                            <th>Next Available</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Central Library</td>
+                                            <td><span class="badge bg-success">Available</span></td>
+                                            <td>Now</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer (same as main page) -->
+</body>
+</html>
+
