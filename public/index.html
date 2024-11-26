@@ -145,5 +145,42 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Script for Featured Books -->
+    <script>
+        async function fetchFeaturedBooks() {
+            try {
+                const response = await fetch('/books'); // Fetch books from the backend
+                const books = await response.json();
+                const featuredContainer = document.querySelector('#featured .row');
+                featuredContainer.innerHTML = ''; // Clear content before adding
+
+                books.slice(0, 3).forEach(book => {
+                    const bookCard = `
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card-custom rounded-4 bg-base shadow-effect">
+                                <div class="card-custom-image rounded-4">
+                                    <img src="/assets/images/book-cover.jpg" class="rounded-4" alt="${book.title}">
+                                </div>
+                                <div class="card-custom-content p-4">
+                                    <h4>${book.title}</h4>
+                                    <p>${book.author}</p>
+                                    <p class="text-muted">${book.year}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="badge bg-success">Available</span>
+                                        <a href="/books/${book._id}" class="link-custom">View Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                    featuredContainer.innerHTML += bookCard;
+                });
+            } catch (error) {
+                console.error('Error fetching featured books:', error);
+            }
+        }
+
+        window.onload = fetchFeaturedBooks;
+    </script>
 </body>
 </html>
