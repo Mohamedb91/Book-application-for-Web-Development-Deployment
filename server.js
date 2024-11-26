@@ -10,7 +10,7 @@ const app = express();
 const port = 3000;
 
 // MongoDB connection URI
-const uri = "your_mongodb_connection_string_here";
+const uri = "mongodb://admin:Sp00ky%21@localhost:27017/?authSource=admin";
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 // Middleware to serve static files and parse request bodies
