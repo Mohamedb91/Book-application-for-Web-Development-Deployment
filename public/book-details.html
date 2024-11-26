@@ -27,36 +27,36 @@
                         </div>
                     </div>
                     <div class="col-lg-8" data-aos="fade-up" data-aos-delay="300">
-                        <h1 class="display-4 fw-bold">Book Title</h1>
-                        <p class="text-brand mb-2">Author Name</p>
-                        <div class="mb-4">
-                            <span class="badge bg-light text-dark me-2">Genre</span>
-                            <span class="badge bg-light text-dark me-2">Year</span>
-                            <span class="badge bg-light text-dark">ISBN</span>
-                        </div>
-                        <h5 class="mb-3">Description</h5>
-                        <p class="lead">Book description goes here...</p>
-                        
-                        <div class="mt-5">
-                            <h5 class="mb-3">Available Copies</h5>
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Library Location</th>
-                                            <th>Status</th>
-                                            <th>Next Available</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>Central Library</td>
-                                            <td><span class="badge bg-success">Available</span></td>
-                                            <td>Now</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                        <button id="addBookButton" class="btn btn-brand mb-4">Add New Book</button>
+                        <div id="addBookFormContainer" style="display:none;">
+                            <form action="/books" method="post" id="addBookForm">
+                                <h1 class="display-4 fw-bold">Add New Book</h1>
+                                <div class="mb-3">
+                                    <label for="title" class="form-label">Title</label>
+                                    <input type="text" id="title" name="title" class="form-control" placeholder="Enter book title" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="author" class="form-label">Author</label>
+                                    <input type="text" id="author" name="author" class="form-control" placeholder="Enter author's name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="genre" class="form-label">Genre</label>
+                                    <input type="text" id="genre" name="genre" class="form-control" placeholder="Enter book genre" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="year" class="form-label">Year</label>
+                                    <input type="text" id="year" name="year" class="form-control" placeholder="Enter publication year" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="isbn" class="form-label">ISBN</label>
+                                    <input type="text" id="isbn" name="isbn" class="form-control" placeholder="Enter ISBN number" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Description</label>
+                                    <textarea id="description" name="description" class="form-control" placeholder="Enter book description" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-brand">Submit</button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -65,6 +65,11 @@
     </div>
 
     <!-- Footer (same as main page) -->
+    <script>
+        document.getElementById('addBookButton').addEventListener('click', function() {
+            var formContainer = document.getElementById('addBookFormContainer');
+            formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
+        });
+    </script>
 </body>
 </html>
-
