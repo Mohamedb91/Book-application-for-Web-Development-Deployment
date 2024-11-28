@@ -7,10 +7,10 @@ const { MongoClient, ObjectId } = require('mongodb');
 const cors = require('cors');
 
 const app = express();
-const port = 3000;
+const port = 3000
 
 // MongoDB connection URI
-const uri = "mongodb://admin:Sp00ky%21@localhost:27017/?authSource=admin";
+const uri = "mongodb://admin:Sp00ky!@localhost:27017/?AuthSource=admin";
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 // Middleware to serve static files and parse request bodies
