@@ -70,6 +70,43 @@
             var formContainer = document.getElementById('addBookFormContainer');
             formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
         });
+
+        // Dynamic Script to Fetch and Display Books
+        async function fetchBooks() {
+            try {
+                const response = await fetch('/books'); // Fetch books from your backend
+                const books = await response.json();
+
+                const bookContainer = document.querySelector('#content-wrapper .row');
+                books.forEach(book => {
+                    const bookCard = `
+                        <div class="col-lg-4" data-aos="fade-up">
+                            <div class="card-custom rounded-4 bg-base shadow-effect">
+                                <div class="card-custom-image rounded-4">
+                                    <img src="/assets/images/book-cover.jpg" class="rounded-4" alt="${book.title}">
+                                </div>
+                                <div class="p-4 text-center">
+                                    <h4>${book.title}</h4>
+                                    <p><strong>Author:</strong> ${book.author}</p>
+                                    <p><strong>Genre:</strong> ${book.genre}</p>
+                                    <p><strong>Year:</strong> ${book.year}</p>
+                                    <p><strong>ISBN:</strong> ${book.isbn}</p>
+                                    <p>${book.description}</p>
+                                    <span class="badge bg-success mb-3">Available</span>
+                                    <button class="btn btn-brand w-100">Reserve Now</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    bookContainer.innerHTML += bookCard;
+                });
+            } catch (error) {
+                console.error('Error fetching books:', error);
+            }
+        }
+
+        // Fetch and display books when the page loads
+        window.onload = fetchBooks;
     </script>
 </body>
 </html>
