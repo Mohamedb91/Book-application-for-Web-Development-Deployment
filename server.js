@@ -81,5 +81,5 @@ app.delete('/books/:id', async (req, res) => {
 // Start server
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
-    connectDB(); // Connect to MongoDB when the server starts
+    connectDB(); // Connect to MongoDB when the server start
 });
