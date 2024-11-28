@@ -154,7 +154,6 @@
                 const books = await response.json();
                 const featuredContainer = document.querySelector('#featured .row');
                 featuredContainer.innerHTML = ''; // Clear content before adding
-
                 books.slice(0, 3).forEach(book => {
                     const bookCard = `
                         <div class="col-md-6 col-lg-4">
@@ -179,7 +178,6 @@
                 console.error('Error fetching featured books:', error);
             }
         }
-
         window.onload = fetchFeaturedBooks;
     </script>
 </body>
