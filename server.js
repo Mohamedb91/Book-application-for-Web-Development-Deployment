@@ -1,5 +1,3 @@
-//npm install express mongodb body-parser, npm install cors
-
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
@@ -7,7 +5,7 @@ const { MongoClient, ObjectId } = require('mongodb');
 const cors = require('cors');
 
 const app = express();
-const port = 3000
+const port = 3000;
 
 // MongoDB connection URI
 const uri = 'mongodb://admin:Sp00ky%21@localhost:27017/?authSource=admin';
@@ -34,6 +32,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// POST endpoint to add books
 app.post('/books', async (req, res) => {
     try {
         const book = {
@@ -42,7 +41,7 @@ app.post('/books', async (req, res) => {
             genre: req.body.genre,
             year: req.body.year,
             isbn: req.body.isbn,
-            description: req.body.description
+            description: req.body.description,
         };
 
         await client.db("library").collection("books").insertOne(book);
@@ -55,15 +54,28 @@ app.post('/books', async (req, res) => {
     }
 });
 
-
-
-// GET endpoint to fetch books
+// GET endpoint to fetch all books
 app.get('/books', async (req, res) => {
     try {
         const books = await client.db("library").collection("books").find({}).toArray();
         res.json(books);
     } catch (e) {
+        console.error("Error fetching books:", e);
         res.status(500).send(e.toString());
+    }
+});
+
+// GET a specific book by ID
+app.get('/books/:id', async (req, res) => {
+    try {
+        const book = await client.db("library").collection("books").findOne({ _id: new ObjectId(req.params.id) });
+        if (!book) {
+            return res.status(404).send({ message: "Book not found" });
+        }
+        res.json(book);
+    } catch (error) {
+        console.error("Error fetching book:", error);
+        res.status(500).send({ message: error.message });
     }
 });
 
@@ -76,6 +88,7 @@ app.put('/books/:id', async (req, res) => {
         );
         res.json(result);
     } catch (e) {
+        console.error("Error updating book:", e);
         res.status(500).send(e.toString());
     }
 });
@@ -86,6 +99,7 @@ app.delete('/books/:id', async (req, res) => {
         const result = await client.db("library").collection("books").deleteOne({ _id: new ObjectId(req.params.id) });
         res.json(result);
     } catch (e) {
+        console.error("Error deleting book:", e);
         res.status(500).send(e.toString());
     }
 });
@@ -93,5 +107,5 @@ app.delete('/books/:id', async (req, res) => {
 // Start server
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
-    connectDB(); // Connect to MongoDB when the server start
+    connectDB(); // Connect to MongoDB when the server starts
 });

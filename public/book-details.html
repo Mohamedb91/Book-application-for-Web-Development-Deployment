@@ -113,30 +113,51 @@
             }
         }
 
-        // Edit Book
-        async function editBook(bookId) {
-            const newTitle = prompt("Enter new title for the book:");
-            if (newTitle) {
-                try {
-                    const response = await fetch(`/books/${bookId}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ title: newTitle })
-                    });
+       // Edit Book
+       async function editBook(bookId) {
+            try {
+                // Fetch the current book data
+                const response = await fetch(`/books/${bookId}`);
+                const book = await response.json();
 
-                    if (response.ok) {
-                        alert("Book updated successfully!");
-                        fetchBooks(); // Refresh book list
-                    } else {
-                        alert("Failed to update book. Please try again.");
-                    }
-                } catch (error) {
-                    console.error("Error updating book:", error);
+                // Prompt user for updated fields
+                const updatedTitle = prompt("Edit Title:", book.title) || book.title;
+                const updatedAuthor = prompt("Edit Author:", book.author) || book.author;
+                const updatedGenre = prompt("Edit Genre:", book.genre) || book.genre;
+                const updatedYear = prompt("Edit Year:", book.year) || book.year;
+                const updatedISBN = prompt("Edit ISBN:", book.isbn) || book.isbn;
+                const updatedDescription = prompt("Edit Description:", book.description) || book.description;
+
+                // Create the updated book object
+                const updatedBook = {
+                    title: updatedTitle,
+                    author: updatedAuthor,
+                    genre: updatedGenre,
+                    year: updatedYear,
+                    isbn: updatedISBN,
+                    description: updatedDescription
+                };
+
+                // Send the updated data to the server
+                const updateResponse = await fetch(`/books/${bookId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedBook)
+                });
+
+                if (updateResponse.ok) {
+                    alert("Book updated successfully!");
+                    fetchBooks(); // Refresh book list
+                } else {
+                    alert("Failed to update book. Please try again.");
                 }
+            } catch (error) {
+                console.error("Error updating book:", error);
             }
         }
+
 
         // Delete Book
         async function deleteBook(bookId) {
