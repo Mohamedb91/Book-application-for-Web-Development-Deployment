@@ -1,58 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Library System</title>
-    <link rel="stylesheet" href="./css/bootstrap.min.css" />
-    <link rel="stylesheet" href="./css/line-awesome.min.css" />
-    <link rel="stylesheet" href="./css/style.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <!-- Navbar (same as main page) -->
-    
-    <div id="content-wrapper">
-        <section class="full-height px-lg-5">
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-lg-8" data-aos="fade-up">
-                        <div class="card-custom rounded-4 bg-base shadow-effect p-5">
-                            <h1 class="text-center mb-4">Create Account</h1>
-                            <form action="register.html" method="POST">
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="firstName" class="form-label">First Name</label>
-                                        <input type="text" class="form-control" id="firstName" name="firstName" required>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="lastName" class="form-label">Last Name</label>
-                                        <input type="text" class="form-control" id="lastName" name="lastName" required>
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="email" class="form-label">Email address</label>
-                                    <input type="email" class="form-control" id="email" name="email" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="password" class="form-label">Password</label>
-                                    <input type="password" class="form-control" id="password" name="password" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="confirmPassword" class="form-label">Confirm Password</label>
-                                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
-                                </div>
-                                <button type="submit" class="btn btn-brand w-100">Create Account</button>
-                                <div class="text-center mt-4">
-                                    <p>Already have an account? <a href="login.html" class="link-custom">Login</a></p>
-                                </div>
-                            </form>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">Library System</a>
+        </div>
+    </nav>
+
+    <!-- Registration Form -->
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card p-4 shadow">
+                    <h1 class="text-center mb-4">Register</h1>
+                    <form id="registerForm">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email address</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
                         </div>
-                    </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Register</button>
+                        <div class="text-center mt-3">
+                            <p>Already have an account? <a href="login.html" class="link">Login</a></p>
+                        </div>
+                    </form>
                 </div>
             </div>
-        </section>
+        </div>
     </div>
 
-    <!-- Footer (same as main page) -->
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async function (event) {
+            event.preventDefault(); // Prevent form submission
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert(result.message);
+                    window.location.href = '/login.html'; // Redirect to login page
+                } else {
+                    alert(result.error || 'Registration failed. Please try again.');
+                }
+            } catch (error) {
+                console.error("Error registering:", error);
+            }
+        });
+    </script>
 </body>
 </html>

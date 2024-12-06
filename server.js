@@ -2,6 +2,8 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const { MongoClient, ObjectId } = require('mongodb');
+const bcrypt = require('bcrypt');
+const session = require('express-session');
 const cors = require('cors');
 
 const app = express();
@@ -9,103 +11,196 @@ const port = 3000;
 
 // MongoDB connection URI
 const uri = 'mongodb://admin:Sp00ky%21@localhost:27017/?authSource=admin';
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+const client = new MongoClient(uri, { useUnifiedTopology: true });
 
-// Middleware to serve static files and parse request bodies
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(cors()); // Enable CORS for all domains
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(
+    session({
+        secret: 'your-secret-key',
+        resave: false,
+        saveUninitialized: true,
+    })
+);
 
 // Connect to MongoDB
 async function connectDB() {
     try {
         await client.connect();
-        console.log("Connected to MongoDB");
-    } catch (e) {
-        console.error("Could not connect to MongoDB", e);
+        console.log('Connected to MongoDB');
+    } catch (err) {
+        console.error('Error connecting to MongoDB', err);
     }
 }
+connectDB();
 
-// Route for the main page
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+// Authentication middleware
+function isAuthenticated(req, res, next) {
+    if (req.session.user) {
+        return next();
+    }
+    res.status(401).json({ error: 'Unauthorized access. Please log in.' });
+}
 
-// POST endpoint to add books
-app.post('/books', async (req, res) => {
+// Register a user
+app.post('/register', async (req, res) => {
+    const { email, password } = req.body;
+
     try {
-        const book = {
-            title: req.body.title,
-            author: req.body.author,
-            genre: req.body.genre,
-            year: req.body.year,
-            isbn: req.body.isbn,
-            description: req.body.description,
-        };
+        const db = client.db('library');
+        const users = db.collection('users');
 
-        await client.db("library").collection("books").insertOne(book);
+        // Check if user already exists
+        const existingUser = await users.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ error: 'User already exists.' });
+        }
 
-        // Redirect to book-details.html after successful addition
-        res.redirect('/book-details.html');
-    } catch (e) {
-        console.error("Error adding book:", e);
-        res.status(500).json({ success: false, error: e.message });
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Save user to database
+        await users.insertOne({ email, password: hashedPassword });
+        res.json({ success: true, message: 'User registered successfully.' });
+    } catch (err) {
+        console.error('Error registering user:', err);
+        res.status(500).json({ error: 'Internal server error.' });
     }
 });
 
-// GET endpoint to fetch all books
+// Login a user
+app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const db = client.db('library');
+        const users = db.collection('users');
+
+        // Find user in database
+        const user = await users.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ error: 'Invalid email or password.' });
+        }
+
+        // Compare password
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(400).json({ error: 'Invalid email or password.' });
+        }
+
+        // Save user session
+        req.session.user = { id: user._id, email: user.email };
+        res.json({ success: true, message: 'Login successful.' });
+    } catch (err) {
+        console.error('Error logging in:', err);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+// Logout a user
+app.post('/logout', (req, res) => {
+    req.session.destroy(() => {
+        res.json({ success: true, message: 'Logout successful.' });
+    });
+});
+
+// Check if user is authenticated
+app.get('/is-authenticated', (req, res) => {
+    res.json({ authenticated: !!req.session.user });
+});
+
+// Add a book
+app.post('/books', isAuthenticated, async (req, res) => {
+    const { title, author, genre, year, isbn, description } = req.body;
+
+    try {
+        const db = client.db('library');
+        const books = db.collection('books');
+        const result = await books.insertOne({ title, author, genre, year, isbn, description });
+        res.json({ success: true, message: 'Book added successfully.', bookId: result.insertedId });
+    } catch (err) {
+        console.error('Error adding book:', err);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+// Fetch all books
 app.get('/books', async (req, res) => {
     try {
-        const books = await client.db("library").collection("books").find({}).toArray();
-        res.json(books);
-    } catch (e) {
-        console.error("Error fetching books:", e);
-        res.status(500).send(e.toString());
+        const db = client.db('library');
+        const books = db.collection('books');
+        const allBooks = await books.find().toArray();
+        res.json(allBooks);
+    } catch (err) {
+        console.error('Error fetching books:', err);
+        res.status(500).json({ error: 'Internal server error.' });
     }
 });
 
-// GET a specific book by ID
+// Fetch a single book by ID
 app.get('/books/:id', async (req, res) => {
+    const bookId = req.params.id;
+
     try {
-        const book = await client.db("library").collection("books").findOne({ _id: new ObjectId(req.params.id) });
+        const db = client.db('library');
+        const book = await db.collection('books').findOne({ _id: new ObjectId(bookId) });
         if (!book) {
-            return res.status(404).send({ message: "Book not found" });
+            return res.status(404).json({ error: 'Book not found.' });
         }
         res.json(book);
-    } catch (error) {
-        console.error("Error fetching book:", error);
-        res.status(500).send({ message: error.message });
+    } catch (err) {
+        console.error('Error fetching book:', err);
+        res.status(500).json({ error: 'Internal server error.' });
     }
 });
 
-// PUT endpoint to update a book
-app.put('/books/:id', async (req, res) => {
+// Edit a book
+app.put('/books/:id', isAuthenticated, async (req, res) => {
+    const bookId = req.params.id;
+    const { title, author, genre, year, isbn, description } = req.body;
+
     try {
-        const result = await client.db("library").collection("books").updateOne(
-            { _id: new ObjectId(req.params.id) },
-            { $set: req.body }
+        const db = client.db('library');
+        const books = db.collection('books');
+        const result = await books.updateOne(
+            { _id: new ObjectId(bookId) },
+            { $set: { title, author, genre, year, isbn, description } }
         );
-        res.json(result);
-    } catch (e) {
-        console.error("Error updating book:", e);
-        res.status(500).send(e.toString());
+
+        if (result.matchedCount === 0) {
+            return res.status(404).json({ error: 'Book not found.' });
+        }
+
+        res.json({ success: true, message: 'Book updated successfully.' });
+    } catch (err) {
+        console.error('Error updating book:', err);
+        res.status(500).json({ error: 'Internal server error.' });
     }
 });
 
-// DELETE endpoint to remove a book
-app.delete('/books/:id', async (req, res) => {
+// Delete a book
+app.delete('/books/:id', isAuthenticated, async (req, res) => {
+    const bookId = req.params.id;
+
     try {
-        const result = await client.db("library").collection("books").deleteOne({ _id: new ObjectId(req.params.id) });
-        res.json(result);
-    } catch (e) {
-        console.error("Error deleting book:", e);
-        res.status(500).send(e.toString());
+        const db = client.db('library');
+        const books = db.collection('books');
+        const result = await books.deleteOne({ _id: new ObjectId(bookId) });
+
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ error: 'Book not found.' });
+        }
+
+        res.json({ success: true, message: 'Book deleted successfully.' });
+    } catch (err) {
+        console.error('Error deleting book:', err);
+        res.status(500).json({ error: 'Internal server error.' });
     }
 });
 
 // Start server
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
-    connectDB(); // Connect to MongoDB when the server starts
 });

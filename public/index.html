@@ -36,6 +36,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="register.html">Register</a>
                     </li>
+                    <li class="nav-item">
+                        <button id="logoutButton" class="btn btn-danger btn-sm">Logout</button>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -109,25 +112,8 @@
                     <h1>Popular Books</h1>
                 </div>
             </div>
-            <div class="row gy-4">
-                <!-- Book Card -->
-                <div class="col-md-6 col-lg-4">
-                    <div class="card-custom rounded-4 bg-base shadow-effect">
-                        <div class="card-custom-image rounded-4">
-                            <img src="/api/placeholder/400/320" class="rounded-4" alt="Book Cover">
-                        </div>
-                        <div class="card-custom-content p-4">
-                            <h4>The Great Gatsby</h4>
-                            <p>F. Scott Fitzgerald</p>
-                            <p class="mb-4">A story of decadence and excess, Gatsby explores the darker aspects of the American Dream.</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="badge bg-success">Available</span>
-                                <a href="/books/1" class="link-custom">View Details</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Repeat book cards for more books -->
+            <div class="row gy-4" id="featured-books">
+                <!-- Featured books dynamically inserted here -->
             </div>
         </div>
     </section>
@@ -146,14 +132,29 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Script for Featured Books -->
+    <!-- Script for Logout and Featured Books -->
     <script>
+        document.getElementById('logoutButton').addEventListener('click', async () => {
+            try {
+                const response = await fetch('/logout', { method: 'POST' });
+                if (response.ok) {
+                    alert('Logout successful!');
+                    window.location.href = '/login.html';
+                } else {
+                    alert('Failed to log out. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error during logout:', error);
+            }
+        });
+
         async function fetchFeaturedBooks() {
             try {
-                const response = await fetch('/books'); // Fetch books from the backend
+                const response = await fetch('/books');
                 const books = await response.json();
-                const featuredContainer = document.querySelector('#featured .row');
-                featuredContainer.innerHTML = ''; // Clear content before adding
+                const featuredContainer = document.getElementById('featured-books');
+                featuredContainer.innerHTML = '';
+
                 books.slice(0, 3).forEach(book => {
                     const bookCard = `
                         <div class="col-md-6 col-lg-4">
@@ -178,6 +179,7 @@
                 console.error('Error fetching featured books:', error);
             }
         }
+
         window.onload = fetchFeaturedBooks;
     </script>
 </body>
