@@ -9,13 +9,51 @@
     <link rel="stylesheet" href="./css/style.css" />
 </head>
 <body>
-    <!-- Navbar (same as main page) -->
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">Library System</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">HOME</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="book-details.html">BOOKS</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="search-page.html">SEARCH</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/locations">LOCATIONS</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="login.html">LOGIN</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="register.html">REGISTER</a>
+                    </li>
+                    <li class="nav-item">
+                        <!-- Logout Link Styled Like the Rest -->
+                        <form action="/logout" method="post" class="d-inline">
+                            <button type="submit" class="nav-link btn btn-link text-dark p-0">LOGOUT</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    
     <div id="content-wrapper">
         <section class="full-height px-lg-5">
             <div class="container">
                 <!-- Add Book Form -->
                 <div class="row gy-4 mt-5">
-                    <div class="col-lg-8" data-aos="fade-up" data-aos-delay="300">
+                    <div class="col-lg-8" data-aos="fade-up">
                         <button id="addBookButton" class="btn btn-brand mb-4">Add New Book</button>
                         <div id="addBookFormContainer" style="display:none;">
                             <form id="addBookForm">
@@ -58,41 +96,47 @@
         </section>
     </div>
 
-    <!-- Footer (same as main page) -->
+    <!-- Footer -->
+    <footer class="py-5">
+        <div class="container">
+            <p class="mb-0">© 2024 Library System. All rights reserved.</p>
+        </div>
+    </footer>
+
     <script>
+        // Toggle Add Book Form
         document.getElementById('addBookButton').addEventListener('click', function () {
-            var formContainer = document.getElementById('addBookFormContainer');
+            const formContainer = document.getElementById('addBookFormContainer');
             formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
         });
 
         // Handle Add Book Form Submission
-        document.getElementById("addBookForm").addEventListener("submit", async function (event) {
-            event.preventDefault(); // Prevent form from refreshing the page
+        document.getElementById('addBookForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
 
-            const title = document.getElementById("title").value.trim();
-            const author = document.getElementById("author").value.trim();
-            const genre = document.getElementById("genre").value.trim();
-            const year = document.getElementById("year").value.trim();
-            const isbn = document.getElementById("isbn").value.trim();
-            const description = document.getElementById("description").value.trim();
+            const title = document.getElementById('title').value.trim();
+            const author = document.getElementById('author').value.trim();
+            const genre = document.getElementById('genre').value.trim();
+            const year = document.getElementById('year').value.trim();
+            const isbn = document.getElementById('isbn').value.trim();
+            const description = document.getElementById('description').value.trim();
 
             try {
-                const response = await fetch("/books", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                const response = await fetch('/books', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ title, author, genre, year, isbn, description }),
                 });
 
                 if (response.ok) {
-                    alert("Book added successfully!");
-                    document.getElementById("addBookFormContainer").style.display = "none"; // Hide form
-                    fetchBooks(); // Refresh book list
+                    alert('Book added successfully!');
+                    document.getElementById('addBookFormContainer').style.display = 'none';
+                    fetchBooks(); // Refresh the book list
                 } else {
-                    alert("Failed to add book. Please try again.");
+                    alert('Failed to add book.');
                 }
             } catch (error) {
-                console.error("Error adding book:", error);
-                alert("An error occurred while adding the book.");
+                console.error('Error adding book:', error);
             }
         });
 
@@ -101,11 +145,10 @@
             try {
                 const response = await fetch('/books');
                 const books = await response.json();
-
-                const bookContainer = document.querySelector('#book-list');
+                const bookContainer = document.getElementById('book-list');
                 bookContainer.innerHTML = '';
 
-                books.forEach((book) => {
+                books.forEach(book => {
                     const bookCard = `
                         <div class="col-lg-4" data-aos="fade-up">
                             <div class="card-custom rounded-4 bg-base shadow-effect">
@@ -124,15 +167,13 @@
                                         <button class="btn btn-warning btn-sm" onclick="editBook('${book._id}')">Edit</button>
                                         <button class="btn btn-danger btn-sm" onclick="deleteBook('${book._id}')">Delete</button>
                                     </div>
-                                    <button class="btn btn-brand w-100 mt-3">Reserve Now</button>
                                 </div>
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                     bookContainer.innerHTML += bookCard;
                 });
             } catch (error) {
-                console.error("Error fetching books:", error);
+                console.error('Error fetching books:', error);
             }
         }
 
@@ -164,32 +205,29 @@
 
                 if (updateResponse.ok) {
                     alert('Book updated successfully!');
-                    fetchBooks(); // Refresh book list
+                    fetchBooks(); // Refresh the book list
                 } else {
-                    alert('Failed to update book. Please try again.');
+                    alert('Failed to update book.');
                 }
             } catch (error) {
                 console.error('Error editing book:', error);
-                alert('An error occurred while editing the book.');
             }
         }
 
         // Delete Book
         async function deleteBook(bookId) {
-            if (confirm("Are you sure you want to delete this book?")) {
+            if (confirm('Are you sure you want to delete this book?')) {
                 try {
-                    const response = await fetch(`/books/${bookId}`, {
-                        method: 'DELETE',
-                    });
+                    const response = await fetch(`/books/${bookId}`, { method: 'DELETE' });
 
                     if (response.ok) {
-                        alert("Book deleted successfully!");
-                        fetchBooks(); // Refresh book list
+                        alert('Book deleted successfully!');
+                        fetchBooks(); // Refresh the book list
                     } else {
-                        alert("Failed to delete book. Please try again.");
+                        alert('Failed to delete book.');
                     }
                 } catch (error) {
-                    console.error("Error deleting book:", error);
+                    console.error('Error deleting book:', error);
                 }
             }
         }
