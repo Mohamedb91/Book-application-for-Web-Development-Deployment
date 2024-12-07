@@ -17,7 +17,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
+                <ul class="navbar-nav ms-auto" id="navbar-links">
                     <li class="nav-item">
                         <a class="nav-link active" href="/">HOME</a>
                     </li>
@@ -30,14 +30,20 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/locations">LOCATIONS</a>
                     </li>
-                    <li class="nav-item">
+                    <!-- Public Links -->
+                    <li class="nav-item" id="login-link">
                         <a class="nav-link" href="login.html">LOGIN</a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item" id="register-link">
                         <a class="nav-link" href="register.html">REGISTER</a>
                     </li>
+                </ul>
+                <ul class="navbar-nav ms-auto d-none" id="auth-links">
+                    <!-- Private Links -->
                     <li class="nav-item">
-                        <!-- Logout Link Styled Like the Rest -->
+                        <a class="nav-link" href="/profile">PROFILE</a>
+                    </li>
+                    <li class="nav-item">
                         <form action="/logout" method="post" class="d-inline">
                             <button type="submit" class="nav-link btn btn-link text-dark p-0">LOGOUT</button>
                         </form>
@@ -46,7 +52,6 @@
             </div>
         </div>
     </nav>
-    
     
     <div id="content-wrapper">
         <section class="full-height px-lg-5">
@@ -104,6 +109,29 @@
     </footer>
 
     <script>
+        // Check user authentication and toggle navbar links
+        fetch('/is-authenticated')
+            .then(res => res.json())
+            .then(data => {
+                const authLinks = document.getElementById('auth-links');
+                const publicLinks = document.getElementById('navbar-links');
+
+                if (data.authenticated) {
+                    // Show authenticated links
+                    authLinks.classList.remove('d-none');
+                    document.getElementById('login-link').classList.add('d-none');
+                    document.getElementById('register-link').classList.add('d-none');
+                } else {
+                    // Show public links
+                    authLinks.classList.add('d-none');
+                    document.getElementById('login-link').classList.remove('d-none');
+                    document.getElementById('register-link').classList.remove('d-none');
+                }
+            })
+            .catch(error => {
+                console.error("Error checking authentication:", error);
+            });
+
         // Toggle Add Book Form
         document.getElementById('addBookButton').addEventListener('click', function () {
             const formContainer = document.getElementById('addBookFormContainer');

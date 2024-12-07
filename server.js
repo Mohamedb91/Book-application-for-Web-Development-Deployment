@@ -44,6 +44,16 @@ function isAuthenticated(req, res, next) {
     res.status(401).json({ error: 'Unauthorized access. Please log in.' });
 }
 
+// Protect the Profile Page
+app.get('/profile.html', (req, res) => {
+    if (!req.session.user) {
+        return res
+            .status(401)
+            .send('<h1>401 Unauthorized</h1><p>You must be logged in to access this page.</p>');
+    }
+    res.sendFile(path.join(__dirname, 'public', 'profile.html'));
+});
+
 // Register a user
 app.post('/register', async (req, res) => {
     const { email, password } = req.body;
@@ -196,6 +206,70 @@ app.delete('/books/:id', isAuthenticated, async (req, res) => {
         res.json({ success: true, message: 'Book deleted successfully.' });
     } catch (err) {
         console.error('Error deleting book:', err);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+// Edit User Password
+app.put('/profile/password', isAuthenticated, async (req, res) => {
+    const { oldPassword, newPassword } = req.body;
+
+    try {
+        const db = client.db('library');
+        const users = db.collection('users');
+
+        const user = await users.findOne({ _id: new ObjectId(req.session.user.id) });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found.' });
+        }
+
+        const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+        if (!isPasswordValid) {
+            return res.status(400).json({ error: 'Incorrect current password.' });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        const result = await users.updateOne(
+            { _id: new ObjectId(req.session.user.id) },
+            { $set: { password: hashedPassword } }
+        );
+
+        if (result.matchedCount === 0) {
+            return res.status(500).json({ error: 'Failed to update password.' });
+        }
+
+        res.json({ success: true, message: 'Password updated successfully.' });
+    } catch (err) {
+        console.error('Error updating password:', err);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+// Search books by query
+app.get('/api/books', async (req, res) => {
+    const query = req.query.query;
+    if (!query) {
+        return res.status(400).json({ error: 'Query parameter is required.' });
+    }
+
+    try {
+        const db = client.db('library');
+        const books = db.collection('books');
+
+        // Search by title, author, or ISBN (case-insensitive)
+        const results = await books
+            .find({
+                $or: [
+                    { title: { $regex: query, $options: 'i' } },
+                    { author: { $regex: query, $options: 'i' } },
+                    { isbn: { $regex: query, $options: 'i' } },
+                ],
+            })
+            .toArray();
+
+        res.json(results);
+    } catch (err) {
+        console.error('Error searching books:', err);
         res.status(500).json({ error: 'Internal server error.' });
     }
 });

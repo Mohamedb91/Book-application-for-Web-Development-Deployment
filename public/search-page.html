@@ -25,8 +25,8 @@
                     <div class="col-lg-8">
                         <div class="search-form">
                             <div class="input-group mb-3">
-                                <input type="text" class="form-control form-control-lg" placeholder="Search by title, author, or ISBN..." aria-label="Search">
-                                <button class="btn btn-brand" type="button">
+                                <input id="searchInput" type="text" class="form-control form-control-lg" placeholder="Search by title, author, or ISBN..." aria-label="Search">
+                                <button id="searchButton" class="btn btn-brand" type="button">
                                     <i class="fas fa-search"></i> Search
                                 </button>
                             </div>
@@ -34,132 +34,64 @@
                     </div>
                 </div>
 
-                <!-- Advanced Search Options -->
-                <div class="row mb-4">
-                    <div class="col-lg-3">
-                        <div class="card-custom bg-base p-4 rounded-4 shadow-effect">
-                            <h5 class="mb-4">Filters</h5>
-                            
-                            <!-- Genre Filter -->
-                            <div class="mb-4">
-                                <label class="form-label">Genre</label>
-                                <select class="form-select">
-                                    <option value="">All Genres</option>
-                                    <option value="fiction">Fiction</option>
-                                    <option value="non-fiction">Non-Fiction</option>
-                                    <option value="mystery">Mystery</option>
-                                    <option value="science-fiction">Science Fiction</option>
-                                    <option value="biography">Biography</option>
-                                </select>
-                            </div>
-
-                            <!-- Year Range -->
-                            <div class="mb-4">
-                                <label class="form-label">Published Year</label>
-                                <div class="d-flex gap-2">
-                                    <input type="number" class="form-control" placeholder="From">
-                                    <input type="number" class="form-control" placeholder="To">
-                                </div>
-                            </div>
-
-                            <!-- Availability Filter -->
-                            <div class="mb-4">
-                                <label class="form-label">Availability</label>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="availableNow">
-                                    <label class="form-check-label" for="availableNow">
-                                        Available Now
-                                    </label>
-                                </div>
-                            </div>
-
-                            <!-- Library Location -->
-                            <div class="mb-4">
-                                <label class="form-label">Library Location</label>
-                                <select class="form-select">
-                                    <option value="">All Locations</option>
-                                    <option value="central">Central Library</option>
-                                    <option value="north">North Branch</option>
-                                    <option value="south">South Branch</option>
-                                </select>
-                            </div>
-
-                            <!-- Clear Filters Button -->
-                            <button class="btn btn-light w-100">Clear Filters</button>
-                        </div>
-                    </div>
-
-                    <!-- Search Results -->
-                    <div class="col-lg-9">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <p class="mb-0">Showing <span class="fw-bold">24</span> results</p>
-                            <select class="form-select w-auto">
-                                <option value="relevance">Sort by Relevance</option>
-                                <option value="title">Sort by Title</option>
-                                <option value="author">Sort by Author</option>
-                                <option value="year">Sort by Year</option>
-                            </select>
-                        </div>
-
-                        <!-- Results Grid -->
-                        <div class="row g-4">
-                            <!-- Book Card Template -->
-                            <div class="col-md-6 col-lg-4">
-                                <div class="card-custom rounded-4 bg-base shadow-effect h-100">
-                                    <div class="card-custom-image rounded-4">
-                                        <img src="/api/placeholder/240/360" class="rounded-4" alt="Book Cover">
-                                    </div>
-                                    <div class="card-custom-content p-4">
-                                        <span class="badge bg-success mb-2">Available</span>
-                                        <h5 class="mb-2">Book Title Here</h5>
-                                        <p class="text-muted mb-2">Author Name</p>
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <small class="text-muted">Central Library</small>
-                                            <a href="#" class="btn btn-sm btn-brand">View Details</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Repeat book card for demonstration -->
-                            <div class="col-md-6 col-lg-4">
-                                <div class="card-custom rounded-4 bg-base shadow-effect h-100">
-                                    <div class="card-custom-image rounded-4">
-                                        <img src="/api/placeholder/240/360" class="rounded-4" alt="Book Cover">
-                                    </div>
-                                    <div class="card-custom-content p-4">
-                                        <span class="badge bg-secondary mb-2">Reserved</span>
-                                        <h5 class="mb-2">Another Book Title</h5>
-                                        <p class="text-muted mb-2">Another Author</p>
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <small class="text-muted">North Branch</small>
-                                            <a href="#" class="btn btn-sm btn-brand">View Details</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Pagination -->
-                        <nav class="mt-5">
-                            <ul class="pagination justify-content-center">
-                                <li class="page-item disabled">
-                                    <a class="page-link" href="#" tabindex="-1">Previous</a>
-                                </li>
-                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#">Next</a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
+                <!-- Search Results -->
+                <div class="row" id="searchResults"></div>
             </div>
         </section>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Event listener for search button
+        document.getElementById('searchButton').addEventListener('click', async () => {
+            const query = document.getElementById('searchInput').value.trim();
+            const resultsContainer = document.getElementById('searchResults');
+            resultsContainer.innerHTML = ''; // Clear previous results
+
+            if (!query) {
+                resultsContainer.innerHTML = '<p class="text-center text-muted">Please enter a search term.</p>';
+                return;
+            }
+
+            try {
+                // Fetch results from the server
+                const response = await fetch(`/api/books?query=${encodeURIComponent(query)}`);
+                const results = await response.json();
+
+                // If no results are found
+                if (results.length === 0) {
+                    resultsContainer.innerHTML = '<p class="text-center text-muted">No books found.</p>';
+                    return;
+                }
+
+                // Render search results
+                results.forEach(book => {
+                    const bookCard = `
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card-custom rounded-4 bg-base shadow-effect h-100">
+                                <div class="card-custom-image rounded-4">
+                                    <img src="/assets/images/book-cover.jpg" class="rounded-4" alt="${book.title}">
+                                </div>
+                                <div class="card-custom-content p-4">
+                                    <span class="badge bg-${book.available ? 'success' : 'secondary'} mb-2">
+                                        ${book.available ? 'Available' : 'Reserved'}
+                                    </span>
+                                    <h5 class="mb-2">${book.title}</h5>
+                                    <p class="text-muted mb-2">${book.author}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">${book.location}</small>
+                                        <a href="#" class="btn btn-sm btn-brand">View Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                    resultsContainer.innerHTML += bookCard;
+                });
+            } catch (error) {
+                console.error('Error fetching search results:', error);
+                resultsContainer.innerHTML = '<p class="text-center text-danger">Error fetching search results. Please try again later.</p>';
+            }
+        });
+    </script>
 </body>
 </html>
