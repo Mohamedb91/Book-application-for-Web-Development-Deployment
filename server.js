@@ -36,6 +36,11 @@ async function connectDB() {
 }
 connectDB();
 
+// Serve locations.html
+app.get('/locations', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'locations.html'));
+});
+
 // Authentication middleware
 function isAuthenticated(req, res, next) {
     if (req.session.user) {

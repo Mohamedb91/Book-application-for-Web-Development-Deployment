@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Locations</title>
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    ></script>
+    <style>
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script>
+        // Real library locations around Dublin
+        const libraries = [
+            { name: "Ballyfermot Library", lat: 53.343, lng: -6.353 },
+            { name: "Ballymun Library", lat: 53.398, lng: -6.268 },
+            { name: "Cabra Library", lat: 53.361, lng: -6.278 },
+            { name: "Central Library", lat: 53.350, lng: -6.264 },
+            { name: "Charleville Mall Library", lat: 53.356, lng: -6.243 },
+            { name: "Coolock Library", lat: 53.389, lng: -6.191 },
+            { name: "Dolphin's Barn Library", lat: 53.334, lng: -6.292 },
+            { name: "Donaghmede Library", lat: 53.394, lng: -6.174 },
+            { name: "Drumcondra Library", lat: 53.372, lng: -6.254 },
+            { name: "Dublin City Library and Archive", lat: 53.343, lng: -6.249 },
+            { name: "Finglas Library", lat: 53.389, lng: -6.297 },
+            { name: "Inchicore Library", lat: 53.341, lng: -6.308 },
+            { name: "Kevin Street Library", lat: 53.337, lng: -6.270 },
+            { name: "Marino Library", lat: 53.368, lng: -6.229 },
+            { name: "Pearse Street Library", lat: 53.343, lng: -6.249 },
+            { name: "Pembroke Library", lat: 53.329, lng: -6.234 },
+            { name: "Phibsboro Library", lat: 53.359, lng: -6.273 },
+            { name: "Raheny Library", lat: 53.380, lng: -6.179 },
+            { name: "Rathmines Library", lat: 53.324, lng: -6.265 },
+            { name: "Ringsend Library", lat: 53.341, lng: -6.230 },
+            { name: "Terenure Library", lat: 53.310, lng: -6.283 },
+            { name: "Walkinstown Library", lat: 53.321, lng: -6.329 },
+        ];
+
+        // Initialize the map centered on Dublin
+        const map = L.map("map").setView([53.349805, -6.26031], 13);
+
+        // Add OpenStreetMap tiles
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
+        }).addTo(map);
+
+        // Haversine formula to calculate distance between two points
+        function haversineDistance(coord1, coord2) {
+            const R = 6371; // Earth's radius in km
+            const dLat = (coord2.lat - coord1.lat) * (Math.PI / 180);
+            const dLng = (coord2.lng - coord1.lng) * (Math.PI / 180);
+
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(coord1.lat * (Math.PI / 180)) *
+                Math.cos(coord2.lat * (Math.PI / 180)) *
+                Math.sin(dLng / 2) * Math.sin(dLng / 2);
+
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c; // Distance in km
+        }
+
+        // Find the nearest library based on user's location
+        function findNearestLibrary(userLocation, libraries) {
+            let nearestLibrary = null;
+            let minDistance = Infinity;
+
+            libraries.forEach((library) => {
+                const distance = haversineDistance(userLocation, {
+                    lat: library.lat,
+                    lng: library.lng,
+                });
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearestLibrary = library;
+                }
+            });
+
+            return nearestLibrary;
+        }
+
+        // Get user's location and find the nearest library
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude,
+                    };
+
+                    // Add a marker for the user's location
+                    L.marker([userLocation.lat, userLocation.lng])
+                        .addTo(map)
+                        .bindPopup("You are here.")
+                        .openPopup();
+
+                    // Find and display the nearest library
+                    const nearestLibrary = findNearestLibrary(userLocation, libraries);
+                    if (nearestLibrary) {
+                        L.marker([nearestLibrary.lat, nearestLibrary.lng])
+                            .addTo(map)
+                            .bindPopup(`Nearest Library: ${nearestLibrary.name}`)
+                            .openPopup();
+                    } else {
+                        alert("No libraries found nearby.");
+                    }
+
+                    // Adjust the map to focus on the user's location
+                    map.setView([userLocation.lat, userLocation.lng], 13);
+                },
+                () => {
+                    alert("Geolocation failed. Enable location services.");
+                }
+            );
+        } else {
+            alert("Your browser does not support geolocation.");
+        }
+
+        // Add markers for all libraries
+        libraries.forEach((library) => {
+            L.marker([library.lat, library.lng])
+                .addTo(map)
+                .bindPopup(library.name);
+        });
+    </script>
+</body>
+</html>
