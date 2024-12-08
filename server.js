@@ -141,6 +141,73 @@ app.post('/logout', (req, res) => {
     });
 });
 
+// Add a book to user's favorites
+app.post('/favorites', isAuthenticated, async (req, res) => {
+    const { bookId } = req.body;
+
+    try {
+        const db = client.db('library');
+        const users = db.collection('users');
+        const books = db.collection('books');
+
+        // Check if the book exists
+        const book = await books.findOne({ _id: new ObjectId(bookId) });
+        if (!book) {
+            return res.status(404).json({ error: 'Book not found.' });
+        }
+
+        // Add book to user's favorites
+        await users.updateOne(
+            { _id: new ObjectId(req.session.user.id) },
+            { $addToSet: { favorites: book } } // Avoid duplicate entries
+        );
+
+        res.json({ success: true, message: 'Book added to favorites.' });
+    } catch (err) {
+        console.error('Error adding book to favorites:', err);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+// Remove a book from user's favorites
+app.delete('/favorites/:bookId', isAuthenticated, async (req, res) => {
+    const { bookId } = req.params;
+
+    try {
+        const db = client.db('library');
+        const users = db.collection('users');
+
+        // Remove the book from the favorites array
+        await users.updateOne(
+            { _id: new ObjectId(req.session.user.id) },
+            { $pull: { favorites: { _id: new ObjectId(bookId) } } }
+        );
+
+        res.json({ success: true, message: 'Book removed from favorites.' });
+    } catch (err) {
+        console.error('Error removing book from favorites:', err);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+// Fetch user's favorite books
+app.get('/profile/favorites', isAuthenticated, async (req, res) => {
+    try {
+        const db = client.db('library');
+        const users = db.collection('users');
+        const user = await users.findOne({ _id: new ObjectId(req.session.user.id) });
+
+        if (!user || !user.favorites) {
+            return res.json([]);
+        }
+
+        res.json(user.favorites);
+    } catch (err) {
+        console.error('Error fetching favorite books:', err);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
 // Serve view-book.html
 app.get('/view-book.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'view-book.html'));

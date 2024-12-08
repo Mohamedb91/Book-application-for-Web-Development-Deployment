@@ -28,6 +28,8 @@
                 <p><strong>Year:</strong> <span id="bookYear"></span></p>
                 <p><strong>ISBN:</strong> <span id="bookISBN"></span></p>
                 <p id="bookDescription" class="mt-4"></p>
+                <button id="addFavoriteButton" class="btn btn-brand mt-3">Add to Favorites</button>
+                <p id="favoriteMessage" class="text-success mt-2" style="display: none;">Book added to favorites!</p>
             </div>
         </div>
     </div>
@@ -60,14 +62,41 @@
                 } else {
                     document.getElementById('bookImage').src = '/assets/images/default-book.jpg';
                 }
+                } else {
+                    document.getElementById('bookDetails').innerHTML = `<p class="text-danger">${book.error || 'Book not found.'}</p>`;
+                }
+            } catch (error) {
+                console.error('Error fetching book details:', error);
+                document.getElementById('bookDetails').innerHTML = '<p class="text-danger">Error fetching book details.</p>';
+            }
+        }
+
+        document.getElementById('addFavoriteButton').addEventListener('click', async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const bookId = urlParams.get('id');
+
+        if (!bookId) {
+            alert('Book ID is missing.');
+            return;
+        }
+
+        try {
+            const response = await fetch('/favorites', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ bookId }),
+            });
+
+            if (response.ok) {
+                document.getElementById('favoriteMessage').style.display = 'block';
             } else {
-                document.getElementById('bookDetails').innerHTML = `<p class="text-danger">${book.error || 'Book not found.'}</p>`;
+                alert('Failed to add book to favorites.');
             }
         } catch (error) {
-            console.error('Error fetching book details:', error);
-            document.getElementById('bookDetails').innerHTML = '<p class="text-danger">Error fetching book details.</p>';
+            console.error('Error adding to favorites:', error);
         }
-    }
+    });
+
 
     // Fetch book details on page load
     window.onload = fetchBookDetails;

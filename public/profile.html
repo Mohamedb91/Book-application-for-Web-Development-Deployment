@@ -21,7 +21,7 @@
                         <a class="nav-link" href="/">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/books">Books</a>
+                        <a class="nav-link" href="book-details.html">Books</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/profile">Profile</a>
@@ -54,6 +54,10 @@
                         <button type="submit" class="btn btn-primary w-100">Update Password</button>
                     </form>
                 </div>
+                <div class="container mt-5">
+                    <h2>Your Favorite Books</h2>
+                    <div id="favoriteBooksList" class="row gy-4 mt-3"></div>                 
+                </div>                
             </div>
         </div>
     </div>
@@ -94,6 +98,62 @@
                 console.error("Error updating password:", error);
             }
         });
+
+        async function fetchFavoriteBooks() {
+            try {
+                const response = await fetch('/profile/favorites');
+                const favorites = await response.json();
+                const favoriteBooksList = document.getElementById('favoriteBooksList');
+                favoriteBooksList.innerHTML = '';
+
+                if (favorites.length === 0) {
+                    favoriteBooksList.innerHTML = '<p>You have no favorite books yet.</p>';
+                    return;
+                }
+
+                favorites.forEach(book => {
+                    const bookCard = `
+                        <div class="col-md-4">
+                            <div class="card-custom rounded-4 bg-base shadow-effect">
+                                <div class="card-custom-image rounded-4">
+                                    <img src="${book.imageUrl || '/assets/images/default-book.jpg'}" class="rounded-4" alt="${book.title}">
+                                </div>
+                                <div class="p-4 text-center">
+                                    <h4>${book.title}</h4>
+                                    <p><strong>Author:</strong> ${book.author}</p>
+                                    <a href="/view-book.html?id=${book._id}" class="btn btn-brand btn-sm mt-2">View Details</a>
+                                    <button class="btn btn-danger btn-sm mt-2" onclick="removeFromFavorites('${book._id}')">Remove</button>
+                                </div>
+                            </div>
+                        </div>`;
+                    favoriteBooksList.innerHTML += bookCard;
+                });
+            } catch (error) {
+                console.error('Error fetching favorite books:', error);
+            }
+        }
+
+        // Function to remove a book from favorites
+        async function removeFromFavorites(bookId) {
+            if (!confirm('Are you sure you want to remove this book from your favorites?')) return;
+
+            try {
+                const response = await fetch(`/favorites/${bookId}`, { method: 'DELETE' });
+
+                if (response.ok) {
+                    alert('Book removed from favorites.');
+                    fetchFavoriteBooks(); // Refresh the favorites list
+                } else {
+                    alert('Failed to remove book from favorites.');
+                }
+            } catch (error) {
+                console.error('Error removing book from favorites:', error);
+            }
+        }
+
+        // Fetch favorite books on page load
+        window.onload = fetchFavoriteBooks;
+
     </script>
 </body>
 </html>
