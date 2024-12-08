@@ -27,9 +27,7 @@
                         <a class="nav-link" href="/profile">Profile</a>
                     </li>
                     <li class="nav-item">
-                        <form action="/logout" method="post" class="d-inline">
-                            <button type="submit" class="btn btn-link nav-link">Logout</button>
-                        </form>
+                        <a href="#" id="logoutButton" class="nav-link">Logout</a>
                     </li>
                 </ul>
             </div>
@@ -150,6 +148,27 @@
                 console.error('Error removing book from favorites:', error);
             }
         }
+
+        // logout Button
+        document.getElementById('logoutButton').addEventListener('click', async function (event) {
+            event.preventDefault(); // Prevent default link behavior
+
+            try {
+                const response = await fetch('/logout', {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    alert('Logout successful!');
+                    window.location.href = '/'; // Redirect to the main page
+                } else {
+                    alert('Failed to log out. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error during logout:', error);
+                alert('An error occurred during logout. Please try again.');
+            }
+        });
 
         // Fetch favorite books on page load
         window.onload = fetchFavoriteBooks;

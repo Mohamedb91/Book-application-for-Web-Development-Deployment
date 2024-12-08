@@ -19,34 +19,29 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto" id="navbar-links">
                     <li class="nav-item">
-                        <a class="nav-link active" href="/">HOME</a>
+                        <a class="nav-link active" href="/">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="book-details.html">BOOKS</a>
+                        <a class="nav-link" href="search-page.html">Search</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="search-page.html">SEARCH</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/locations">LOCATIONS</a>
+                        <a class="nav-link" href="locations.html">Location</a>
                     </li>
                     <!-- Public Links -->
                     <li class="nav-item" id="login-link">
-                        <a class="nav-link" href="login.html">LOGIN</a>
+                        <a class="nav-link" href="login.html">Login</a>
                     </li>
                     <li class="nav-item" id="register-link">
-                        <a class="nav-link" href="register.html">REGISTER</a>
+                        <a class="nav-link" href="register.html">Register</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav ms-auto d-none" id="auth-links">
                     <!-- Private Links -->
                     <li class="nav-item">
-                        <a class="nav-link" href="/profile">PROFILE</a>
+                        <a class="nav-link" href="profile.html">Profile</a>
                     </li>
                     <li class="nav-item">
-                        <form action="/logout" method="post" class="d-inline">
-                            <button type="submit" class="nav-link btn btn-link text-dark p-0">LOGOUT</button>
-                        </form>
+                        <a href="#" id="logoutButton" class="nav-link">Logout</a>
                     </li>
                 </ul>
             </div>
@@ -130,6 +125,28 @@
         .catch(error => {
             console.error("Error checking authentication:", error);
         });
+
+        // logout Button
+        document.getElementById('logoutButton').addEventListener('click', async function (event) {
+            event.preventDefault(); // Prevent default link behavior
+
+            try {
+                const response = await fetch('/logout', {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    alert('Logout successful!');
+                    window.location.href = '/'; // Redirect to the main page
+                } else {
+                    alert('Failed to log out. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error during logout:', error);
+                alert('An error occurred during logout. Please try again.');
+            }
+        });
+
         // Check if user is logged in, restrict access to the page
         fetch('/is-authenticated')
             .then(res => res.json())
@@ -221,16 +238,25 @@
         }
         });
 
-
-        // Fetch and Display Books
+        // Fetch and Display Books with Admin Controls
         async function fetchBooks() {
             try {
+                // Check if the user is an admin
+                const authResponse = await fetch('/is-authenticated');
+                const authData = await authResponse.json();
+                const isAdmin = authData.isAdmin || false; // Assuming the server returns `isAdmin`
+
                 const response = await fetch('/books');
                 const books = await response.json();
                 const bookContainer = document.getElementById('book-list');
                 bookContainer.innerHTML = '';
 
                 books.forEach(book => {
+                    const adminButtons = isAdmin
+                        ? `<button class="btn btn-warning btn-sm" onclick="editBook('${book._id}')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteBook('${book._id}')">Delete</button>`
+                        : '';
+
                     const bookCard = `
                         <div class="col-lg-4" data-aos="fade-up">
                             <div class="card-custom rounded-4 bg-base shadow-effect">
@@ -245,8 +271,7 @@
                                     <span class="badge bg-success mb-3">Available</span>
                                     <div class="d-flex justify-content-center gap-2 mt-2">
                                         <a href="view-book.html?id=${book._id}" class="btn btn-info btn-sm">View Details</a>
-                                        <button class="btn btn-warning btn-sm" onclick="editBook('${book._id}')">Edit</button>
-                                        <button class="btn btn-danger btn-sm" onclick="deleteBook('${book._id}')">Delete</button>
+                                        ${adminButtons}
                                     </div>
                                 </div>
                             </div>
@@ -256,7 +281,8 @@
             } catch (error) {
                 console.error('Error fetching books:', error);
             }
-}
+        }
+
 
         // Edit Book
         async function editBook(bookId) {

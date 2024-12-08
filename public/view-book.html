@@ -9,9 +9,44 @@
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
         <div class="container">
             <a class="navbar-brand fw-bold" href="/">Library System</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto" id="navbar-links">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="search-page.html">Search</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="locations.html">Location</a>
+                    </li>
+                    <!-- Public Links -->
+                    <li class="nav-item" id="login-link">
+                        <a class="nav-link" href="login.html">Login</a>
+                    </li>
+                    <li class="nav-item" id="register-link">
+                        <a class="nav-link" href="register.html">Register</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto d-none" id="auth-links">
+                    <!-- Private Links -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="profile.html">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="book-details.html">Books</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" id="logoutButton" class="nav-link">Logout</a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
 
@@ -30,76 +65,105 @@
                 <p id="bookDescription" class="mt-4"></p>
                 <button id="addFavoriteButton" class="btn btn-brand mt-3">Add to Favorites</button>
                 <p id="favoriteMessage" class="text-success mt-2" style="display: none;">Book added to favorites!</p>
+                <a id="buyBookButton" href="#" target="_blank" class="btn btn-success mt-3">Buy on Amazon</a>
             </div>
         </div>
     </div>
 
     <script>
         async function fetchBookDetails() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const bookId = urlParams.get('id');
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookId = urlParams.get('id');
 
-        if (!bookId) {
-            document.getElementById('bookDetails').innerHTML = '<p class="text-danger">Book ID is missing.</p>';
-            return;
-        }
+            if (!bookId) {
+                document.getElementById('bookTitle').innerHTML = '<p class="text-danger">Book ID is missing.</p>';
+                return;
+            }
 
-        try {
-            const response = await fetch(`/books/${bookId}`);
-            const book = await response.json();
+            try {
+                const response = await fetch(`/books/${bookId}`);
+                const book = await response.json();
 
-            if (response.ok) {
-                document.getElementById('bookTitle').textContent = book.title;
-                document.getElementById('bookAuthor').textContent = book.author;
-                document.getElementById('bookGenre').textContent = book.genre;
-                document.getElementById('bookYear').textContent = book.year;
-                document.getElementById('bookISBN').textContent = book.isbn;
-                document.getElementById('bookDescription').textContent = book.description;
+                if (response.ok) {
+                    document.getElementById('bookTitle').textContent = book.title;
+                    document.getElementById('bookAuthor').textContent = book.author;
+                    document.getElementById('bookGenre').textContent = book.genre;
+                    document.getElementById('bookYear').textContent = book.year;
+                    document.getElementById('bookISBN').textContent = book.isbn;
+                    document.getElementById('bookDescription').textContent = book.description;
 
-                // Update the book image
-                if (book.imageUrl) {
-                    document.getElementById('bookImage').src = book.imageUrl;
+                    // Update the book image
+                    if (book.imageUrl) {
+                        document.getElementById('bookImage').src = book.imageUrl;
+                    } else {
+                        document.getElementById('bookImage').src = '/assets/images/default-book.jpg';
+                    }
+
+                    // Set the Amazon buy link if ISBN exists
+                    if (book.isbn) {
+                        const amazonLink = `https://www.amazon.co.uk/s?k=${encodeURIComponent(book.isbn)}`;
+                        document.getElementById('buyBookButton').href = amazonLink;
+                    } else {
+                        document.getElementById('buyBookButton').style.display = 'none';
+                    }
                 } else {
-                    document.getElementById('bookImage').src = '/assets/images/default-book.jpg';
-                }
-                } else {
-                    document.getElementById('bookDetails').innerHTML = `<p class="text-danger">${book.error || 'Book not found.'}</p>`;
+                    document.getElementById('bookTitle').innerHTML = `<p class="text-danger">${book.error || 'Book not found.'}</p>`;
                 }
             } catch (error) {
                 console.error('Error fetching book details:', error);
-                document.getElementById('bookDetails').innerHTML = '<p class="text-danger">Error fetching book details.</p>';
+                document.getElementById('bookTitle').innerHTML = '<p class="text-danger">Error fetching book details.</p>';
             }
         }
 
         document.getElementById('addFavoriteButton').addEventListener('click', async () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const bookId = urlParams.get('id');
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookId = urlParams.get('id');
 
-        if (!bookId) {
-            alert('Book ID is missing.');
-            return;
-        }
-
-        try {
-            const response = await fetch('/favorites', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ bookId }),
-            });
-
-            if (response.ok) {
-                document.getElementById('favoriteMessage').style.display = 'block';
-            } else {
-                alert('Failed to add book to favorites.');
+            if (!bookId) {
+                alert('Book ID is missing.');
+                return;
             }
-        } catch (error) {
-            console.error('Error adding to favorites:', error);
-        }
-    });
 
+            try {
+                const response = await fetch('/favorites', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ bookId }),
+                });
 
-    // Fetch book details on page load
-    window.onload = fetchBookDetails;
+                if (response.ok) {
+                    document.getElementById('favoriteMessage').style.display = 'block';
+                } else {
+                    alert('Failed to add book to favorites.');
+                }
+            } catch (error) {
+                console.error('Error adding to favorites:', error);
+            }
+        });
+
+        // Logout Button
+        document.getElementById('logoutButton').addEventListener('click', async function (event) {
+            event.preventDefault(); // Prevent default link behavior
+
+            try {
+                const response = await fetch('/logout', {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    alert('Logout successful!');
+                    window.location.href = '/'; // Redirect to the main page
+                } else {
+                    alert('Failed to log out. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error during logout:', error);
+                alert('An error occurred during logout. Please try again.');
+            }
+        });
+
+        // Fetch book details on page load
+        window.onload = fetchBookDetails;
     </script>
 </body>
 </html>

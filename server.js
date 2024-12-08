@@ -213,6 +213,7 @@ app.get('/profile/favorites', isAuthenticated, async (req, res) => {
     }
 });
 
+
 // Serve view-book.html
 app.get('/view-book.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'view-book.html'));
@@ -220,8 +221,13 @@ app.get('/view-book.html', (req, res) => {
 
 // Check if user is authenticated
 app.get('/is-authenticated', (req, res) => {
-    res.json({ authenticated: !!req.session.user });
+    if (req.session.user) {
+        res.json({ authenticated: true, isAdmin: req.session.user.email === 'admin@gmail.com' });
+    } else {
+        res.json({ authenticated: false });
+    }
 });
+
 
 // Add a book
 app.post('/books', isAdmin, async (req, res) => {
@@ -259,15 +265,18 @@ app.get('/books/:id', async (req, res) => {
     try {
         const db = client.db('library');
         const book = await db.collection('books').findOne({ _id: new ObjectId(bookId) });
+
         if (!book) {
             return res.status(404).json({ error: 'Book not found.' });
         }
+
         res.json(book);
     } catch (err) {
         console.error('Error fetching book:', err);
         res.status(500).json({ error: 'Internal server error.' });
     }
 });
+
 
 // Edit a book
 app.put('/books/:id', isAdmin, async (req, res) => {

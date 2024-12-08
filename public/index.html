@@ -44,15 +44,15 @@
                         <a class="nav-link" href="profile.html">Profile</a>
                     </li>
                     <li class="nav-item">
-                        <a id="logoutButton" class="nav-link" href="#">Logout</a>
+                        <a href="#" id="logoutButton" class="nav-link">Logout</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section id="home" class="section full-height px-3 px-lg-5">
+        <!-- Welcome Section -->
+    <section id="home" class="section full-height px-3 px-lg-5" data-bg="images/welcome-bg.jpg">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-8 col-md-10">
@@ -67,8 +67,8 @@
         </div>
     </section>
 
-    <!-- Search Section  -->
-    <section id="search" class="section px-3 px-lg-5 bg-base2">
+    <!-- Search Section -->
+    <section id="search" class="section full-height px-3 px-lg-5 bg-base2" data-bg="images/search-bg.jpg">
         <div class="container">
             <div class="row pb-4">
                 <div class="col-lg-8">
@@ -85,15 +85,6 @@
                             </div>
                             <div class="col-md-6">
                                 <select class="form-select form-select-lg">
-                                    <option selected>Select Genre</option>
-                                    <option>Fiction</option>
-                                    <option>Non-Fiction</option>
-                                    <option>Science</option>
-                                    <option>History</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <select class="form-select form-select-lg">
                                     <option selected>Select Library</option>
                                     <option>Central Library</option>
                                     <option>North Branch</option>
@@ -101,8 +92,8 @@
                                 </select>
                             </div>
                             <div class="col-12">
-                                <button class="btn btn-brand">Search</button>
-                            </div>
+                                <button class="btn btn-brand" id="searchButton">Search</button>
+                            </div>                            
                         </div>
                     </div>
                 </div>
@@ -111,7 +102,7 @@
     </section>
 
     <!-- Featured Books Section -->
-    <section id="featured" class="section px-3 px-lg-5">
+    <section id="featured" class="section full-height px-3 px-lg-5" data-bg="images/featured-bg.jpg">
         <div class="container">
             <div class="row pb-4">
                 <div class="col-lg-8">
@@ -124,6 +115,7 @@
             </div>
         </div>
     </section>
+
 
     <!-- Footer -->
     <footer class="py-5">
@@ -141,6 +133,16 @@
 
     <!-- Script for Dynamic Navbar and Featured Books -->
     <script>
+        // smooth Scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
         // Check user authentication and toggle navbar links
         fetch('/is-authenticated')
             .then(res => res.json())
@@ -159,19 +161,24 @@
             })
             .catch(err => console.error('Error checking authentication:', err));
 
-        // Handle Logout and Redirect to Home
-        document.getElementById('logoutButton').addEventListener('click', async (e) => {
-            e.preventDefault();
+        // logout Button
+        document.getElementById('logoutButton').addEventListener('click', async function (event) {
+            event.preventDefault(); // Prevent default link behavior
+
             try {
-                const response = await fetch('/logout', { method: 'POST' });
+                const response = await fetch('/logout', {
+                    method: 'POST'
+                });
+
                 if (response.ok) {
                     alert('Logout successful!');
-                    window.location.href = '/';
+                    window.location.href = '/'; // Redirect to the main page
                 } else {
                     alert('Failed to log out. Please try again.');
                 }
             } catch (error) {
                 console.error('Error during logout:', error);
+                alert('An error occurred during logout. Please try again.');
             }
         });
 
@@ -186,14 +193,14 @@
                 books.slice(0, 3).forEach(book => {
                     const bookCard = `
                         <div class="col-md-6 col-lg-4">
-                            <div class="card-custom rounded-4 bg-base shadow-effect">
+                            <div class="card-custom rounded-4 shadow-effect">
                                 <div class="card-custom-image rounded-4">
-                                    <img src="/assets/images/book-cover.jpg" class="rounded-4" alt="${book.title}">
+                                    <img src=${book.imageUrl || '/assets/images/book-cover.jpg'} class="rounded-4" alt="Book Title">
                                 </div>
                                 <div class="card-custom-content p-4">
                                     <h4>${book.title}</h4>
-                                    <p>${book.author}</p>
-                                    <p class="text-muted">${book.year}</p>
+                                    <p><strong>Author:</strong> ${book.author}</p>
+                                    <p><strong>Year:</strong> ${book.year}</p>
                                     <div class="d-flex justify-content-between align-items-center">
                                         <span class="badge bg-success">Available</span>
                                         <a href="view-book.html?id=${book._id}" class="btn btn-sm btn-brand">View Details</a>
@@ -207,6 +214,19 @@
                 console.error('Error fetching featured books:', error);
             }
         }
+
+        // Handle Search and Redirect to Search Page
+        document.getElementById('searchButton').addEventListener('click', () => {
+            const searchQuery = document.querySelector('.form-control.form-control-lg').value.trim();
+
+            // Construct the search parameters
+            const params = new URLSearchParams();
+            if (searchQuery) params.append('query', searchQuery);
+
+            // Redirect to search-page.html with the parameters
+            window.location.href = `search-page.html?${params.toString()}`;
+        });
+
 
         window.onload = fetchFeaturedBooks;
     </script>

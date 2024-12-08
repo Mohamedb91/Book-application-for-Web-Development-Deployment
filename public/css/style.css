@@ -12,6 +12,47 @@
     --font-base: "Bai Jamjuree";
 }
 
+/* Full Height Section Styling */
+.section {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 2rem;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: background 1s ease;
+}
+
+/* Smooth Scroll */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Overlay for Better Readability */
+.section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 0;
+}
+
+.section > .container {
+    position: relative;
+    z-index: 1;
+}
+
+/* Background Images for Sections */
+#home { background-image: url('images/welcome-bg.jpg'); }
+#search { background-image: url('images/search-bg.jpg'); }
+#featured { background-image: url('images/featured-bg.jpg'); }
+
 /* General Body and Text Styling */
 body {
     background-color: var(--color-base2);
@@ -71,53 +112,88 @@ img {
 
 /* Navbar Styling */
 .navbar {
-    background-color: var(--color-base);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    background-color: #5a4638; /* Dark brown navbar background */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
+
 .navbar .nav-link {
-    font-weight: 700;
-    text-transform: uppercase;
-    color: var(--color-body);
+    color: #e6d4c3; /* Light beige text */
 }
+
 .navbar .nav-link:hover,
 .navbar .nav-link.active {
-    color: var(--color-brand);
+    color: #cbb292; /* Lighter brown on hover */
 }
 
 /* Button Styling */
-.btn {
-    padding: 12px 28px;
-    font-weight: 700;
-}
 .btn-brand {
-    background-color: var(--color-brand);
-    border-color: var(--color-brand);
-    color: var(--color-base);
-}
-.btn-brand:hover,
-.btn-brand:focus {
-    background-color: var(--color-brand2);
-    color: var(--color-base);
-    border-color: var(--color-brand2);
+    background-color: #8c6e54; /* Warm brown button color */
+    border-color: #8c6e54;
+    color: #ffffff;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
+.btn-brand:hover {
+    background-color: #745843; /* Slightly darker brown on hover */
+    border-color: #745843;
+}
 /* Card Styling */
 .card-custom {
-    background-color: var(--color-base);
+    background-color: #e6d4c3; /* Warm beige background */
     border: none;
     border-radius: 10px;
+    color: #5a4638; /* Dark brown text for contrast */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+
+.card-custom:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Card Image Styling */
 .card-custom .card-custom-image {
-    overflow: hidden;
     height: 250px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    overflow: hidden;
+    background-color: #cbb292; /* Fallback background color */
 }
+
 .card-custom .card-custom-image img {
-    transition: all 0.4s ease;
+    width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.4s ease;
 }
+
 .card-custom:hover .card-custom-image img {
-    transform: scale(1.1);
+    transform: scale(1.05); /* Slight zoom effect on hover */
+}
+
+/* Card Content Styling */
+.card-custom-content {
+    padding: 1.5rem;
+    color: #5a4638; /* Text color matching the library theme */
+}
+
+.card-custom h5 {
+    color: #3e2d1e; /* Darker brown heading */
+    font-weight: 700;
+}
+
+.card-custom p {
+    color: #5a4638; /* Subdued brown text */
+    font-size: 1rem;
+}
+
+/* Badge Styling */
+.card-custom .badge {
+    font-size: 0.9rem;
+    padding: 0.5em 1em;
+    background-color: #8c6e54; /* Warm brown for badges */
+    color: #fff;
+    border-radius: 20px;
 }
 
 /* Form Controls */
@@ -246,4 +322,103 @@ img {
 }
 .btn-light:hover {
     background-color: #e9ecef;
+}
+/* Main Page Section Text Styling */
+.section {
+    color: #fff; /* Set text color to white for all sections */
+}
+/* Section 1 (Home) - All Text White */
+#home {
+    color: #fff; /* White text for the entire section */
+}
+
+#home h1,
+#home p,
+#home a {
+    color: #fff; /* Ensure headings, paragraphs, and buttons are white */
+}
+
+/* Section 2 (Search) - Large Headings White, Card Text Brown */
+#search h6,
+#search h1 {
+    color: #fff; /* White color for the main headings */
+}
+
+#search .search-form {
+    background-color: #e6d4c3; /* Beige background for the search card */
+    color: #5a4638; /* Brown text for the card content */
+}
+
+#search .search-form .form-control,
+#search .search-form .form-select,
+#search .search-form .btn-brand {
+    color: #5a4638; /* Brown text for input fields and button */
+}
+
+/* Section 3 (Featured Books) - Large Headings White, Card Text Brown */
+#featured h6,
+#featured h1 {
+    color: #fff; /* White color for the main headings */
+}
+
+#featured .card-custom {
+    background-color: #e6d4c3; /* Beige background for cards */
+    color: #5a4638; /* Brown text for card content */
+}
+
+#featured .card-custom h5,
+#featured .card-custom p {
+    color: #5a4638; /* Brown text for headings and paragraphs within cards */
+}
+
+/* Search Form Styling */
+.search-form {
+    background-color: #e6d4c3; /* Warm beige background to match card color */
+    border: none;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    color: #5a4638; /* Dark brown text for readability */
+}
+
+/* Form Control Styling for Search */
+.search-form .form-control {
+    background-color: #f4e9dd; /* Light beige background for inputs */
+    border: 1px solid #d0b89f; /* Border to match the warm color scheme */
+    color: #5a4638; /* Dark brown text */
+}
+
+.search-form .form-control::placeholder {
+    color: #8c6e54; /* Placeholder text with a subdued brown tone */
+}
+
+.search-form .form-control:focus {
+    border-color: #8c6e54; /* Warm brown border on focus */
+    box-shadow: 0 0 0 3px rgba(140, 110, 84, 0.2);
+}
+
+/* Dropdown Styling */
+.search-form .form-select {
+    background-color: #f4e9dd;
+    border: 1px solid #d0b89f;
+    color: #5a4638;
+}
+
+.search-form .form-select:focus {
+    border-color: #8c6e54;
+    box-shadow: 0 0 0 3px rgba(140, 110, 84, 0.2);
+}
+
+/* Search Button Styling */
+.search-form .btn-brand {
+    background-color: #8c6e54; /* Warm brown button color */
+    color: #fff;
+    padding: 0.8rem 2rem;
+    border-radius: 5px;
+    border: none;
+    transition: background-color 0.3s ease;
+}
+
+.search-form .btn-brand:hover {
+    background-color: #745843; /* Slightly darker shade on hover */
 }
