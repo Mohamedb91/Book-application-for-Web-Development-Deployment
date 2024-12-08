@@ -153,12 +153,12 @@ app.get('/is-authenticated', (req, res) => {
 
 // Add a book
 app.post('/books', isAdmin, async (req, res) => {
-    const { title, author, genre, year, isbn, description } = req.body;
+    const { title, author, genre, year, isbn, description, imageUrl } = req.body;
 
     try {
         const db = client.db('library');
         const books = db.collection('books');
-        const result = await books.insertOne({ title, author, genre, year, isbn, description });
+        const result = await books.insertOne({ title, author, genre, year, isbn, description, imageUrl });
         res.json({ success: true, message: 'Book added successfully.', bookId: result.insertedId });
     } catch (err) {
         console.error('Error adding book:', err);

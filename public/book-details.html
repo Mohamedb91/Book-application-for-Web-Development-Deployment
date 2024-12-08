@@ -72,10 +72,6 @@
                                     <input type="text" id="author" name="author" class="form-control" placeholder="Enter author's name" required />
                                 </div>
                                 <div class="mb-3">
-                                    <label for="genre" class="form-label">Genre</label>
-                                    <input type="text" id="genre" name="genre" class="form-control" placeholder="Enter book genre" required />
-                                </div>
-                                <div class="mb-3">
                                     <label for="year" class="form-label">Year</label>
                                     <input type="text" id="year" name="year" class="form-control" placeholder="Enter publication year" required />
                                 </div>
@@ -88,6 +84,7 @@
                                     <label for="imageUrl" class="form-label">Image URL</label>
                                     <input type="text" id="imageUrl" name="imageUrl" class="form-control" placeholder="Enter image URL or fetch automatically" />
                                 </div>
+                                
                                 <div class="mb-3">
                                     <label for="description" class="form-label">Description</label>
                                     <textarea id="description" name="description" class="form-control" placeholder="Enter book description" required></textarea>
@@ -115,19 +112,17 @@
 
     <script>
     // Check user authentication and toggle navbar links
-    fetch('/is-authenticated')
+        fetch('/is-authenticated')
         .then(res => res.json())
         .then(data => {
             const authLinks = document.getElementById('auth-links');
             const publicLinks = document.getElementById('navbar-links');
 
             if (data.authenticated) {
-                // Show authenticated links
                 authLinks.classList.remove('d-none');
                 document.getElementById('login-link').classList.add('d-none');
                 document.getElementById('register-link').classList.add('d-none');
             } else {
-                // Show public links
                 authLinks.classList.add('d-none');
                 document.getElementById('login-link').classList.remove('d-none');
                 document.getElementById('register-link').classList.remove('d-none');
@@ -136,7 +131,6 @@
         .catch(error => {
             console.error("Error checking authentication:", error);
         });
-
         // Check if user is logged in, restrict access to the page
         fetch('/is-authenticated')
             .then(res => res.json())
@@ -157,34 +151,45 @@
         });
 
         // Handle Add Book Form Submission
-        document.getElementById('addBookForm').addEventListener('submit', async function (event) {
-            event.preventDefault();
+        document.getElementById('fetchBookData').addEventListener('click', async () => {
+        const isbn = document.getElementById('isbn').value.trim();
+        if (!isbn) {
+            alert('Please enter an ISBN number.');
+            return;
+        }
 
-            const title = document.getElementById('title').value.trim();
-            const author = document.getElementById('author').value.trim();
-            const genre = document.getElementById('genre').value.trim();
-            const year = document.getElementById('year').value.trim();
-            const isbn = document.getElementById('isbn').value.trim();
-            const description = document.getElementById('description').value.trim();
+        try {
+            // Fetch book data from the Open Library API
+            const response = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`);
+            const data = await response.json();
 
-            try {
-                const response = await fetch('/books', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ title, author, genre, year, isbn, description }),
-                });
-
-                if (response.ok) {
-                    alert('Book added successfully!');
-                    document.getElementById('addBookFormContainer').style.display = 'none';
-                    fetchBooks(); // Refresh the book list
-                } else {
-                    alert('Failed to add book.');
-                }
-            } catch (error) {
-                console.error('Error adding book:', error);
+            if (!data[`ISBN:${isbn}`]) {
+                alert('Book data not found for the given ISBN.');
+                return;
             }
-        });
+
+            const bookData = data[`ISBN:${isbn}`];
+
+            // Fill out the form fields with fetched data
+            document.getElementById('title').value = bookData.title || '';
+            document.getElementById('author').value = bookData.authors ? bookData.authors[0].name : '';
+            document.getElementById('year').value = bookData.publish_date || '';
+            document.getElementById('description').value = bookData.excerpts ? bookData.excerpts[0].text : '';
+
+            // Set the image URL if available
+            if (bookData.cover && bookData.cover.large) {
+                document.getElementById('imageUrl').value = bookData.cover.large;
+            } else {
+                document.getElementById('imageUrl').value = '';
+            }
+
+            alert('Book data fetched successfully!');
+        } catch (error) {
+            console.error('Error fetching book data:', error);
+            alert('An error occurred while fetching book data. Please try again later.');
+        }
+    });
+
 
         // Fetch and Display Books
         async function fetchBooks() {
@@ -199,7 +204,7 @@
                         <div class="col-lg-4" data-aos="fade-up">
                             <div class="card-custom rounded-4 bg-base shadow-effect">
                                 <div class="card-custom-image rounded-4">
-                                    <img src="/assets/images/book-cover.jpg" class="rounded-4" alt="${book.title}">
+                                    <img src="${book.imageUrl || '/assets/images/book-cover.jpg'}" class="rounded-4" alt="${book.title}">
                                 </div>
                                 <div class="p-4 text-center">
                                     <h4>${book.title}</h4>
@@ -210,6 +215,7 @@
                                     <p>${book.description}</p>
                                     <span class="badge bg-success mb-3">Available</span>
                                     <div class="d-flex justify-content-center gap-2 mt-2">
+                                        <a href="view-book.html?id=${book._id}" class="btn btn-info btn-sm">View Details</a>
                                         <button class="btn btn-warning btn-sm" onclick="editBook('${book._id}')">Edit</button>
                                         <button class="btn btn-danger btn-sm" onclick="deleteBook('${book._id}')">Delete</button>
                                     </div>
@@ -221,7 +227,7 @@
             } catch (error) {
                 console.error('Error fetching books:', error);
             }
-        }
+}
 
         // Edit Book
         async function editBook(bookId) {
@@ -235,6 +241,7 @@
                 const updatedYear = prompt('Edit Year:', book.year) || book.year;
                 const updatedISBN = prompt('Edit ISBN:', book.isbn) || book.isbn;
                 const updatedDescription = prompt('Edit Description:', book.description) || book.description;
+                const updatedImageUrl = prompt('Edit Image URL:', book.imageUrl) || book.imageUrl;
 
                 const updateResponse = await fetch(`/books/${bookId}`, {
                     method: 'PUT',
@@ -246,6 +253,7 @@
                         year: updatedYear,
                         isbn: updatedISBN,
                         description: updatedDescription,
+                        imageUrl: updatedImageUrl
                     }),
                 });
 

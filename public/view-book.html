@@ -33,42 +33,44 @@
     </div>
 
     <script>
-        // Fetch and display book details based on the book ID in the URL
         async function fetchBookDetails() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const bookId = urlParams.get('id');
+        const urlParams = new URLSearchParams(window.location.search);
+        const bookId = urlParams.get('id');
 
-            if (!bookId) {
-                document.body.innerHTML = '<div class="container py-5"><p class="text-danger">Book ID is missing.</p></div>';
-                return;
-            }
-
-            try {
-                const response = await fetch(`/books/${bookId}`);
-                const book = await response.json();
-
-                if (response.ok) {
-                    document.getElementById('bookTitle').textContent = book.title;
-                    document.getElementById('bookAuthor').textContent = book.author;
-                    document.getElementById('bookGenre').textContent = book.genre;
-                    document.getElementById('bookYear').textContent = book.year;
-                    document.getElementById('bookISBN').textContent = book.isbn;
-                    document.getElementById('bookDescription').textContent = book.description;
-
-                    // Update book image if available
-                    if (book.imageUrl) {
-                        document.getElementById('bookImage').src = book.imageUrl;
-                    }
-                } else {
-                    document.body.innerHTML = `<div class="container py-5"><p class="text-danger">${book.error || 'Book not found.'}</p></div>`;
-                }
-            } catch (error) {
-                console.error('Error fetching book details:', error);
-                document.body.innerHTML = '<div class="container py-5"><p class="text-danger">Error fetching book details.</p></div>';
-            }
+        if (!bookId) {
+            document.getElementById('bookDetails').innerHTML = '<p class="text-danger">Book ID is missing.</p>';
+            return;
         }
 
-        window.onload = fetchBookDetails;
+        try {
+            const response = await fetch(`/books/${bookId}`);
+            const book = await response.json();
+
+            if (response.ok) {
+                document.getElementById('bookTitle').textContent = book.title;
+                document.getElementById('bookAuthor').textContent = book.author;
+                document.getElementById('bookGenre').textContent = book.genre;
+                document.getElementById('bookYear').textContent = book.year;
+                document.getElementById('bookISBN').textContent = book.isbn;
+                document.getElementById('bookDescription').textContent = book.description;
+
+                // Update the book image
+                if (book.imageUrl) {
+                    document.getElementById('bookImage').src = book.imageUrl;
+                } else {
+                    document.getElementById('bookImage').src = '/assets/images/default-book.jpg';
+                }
+            } else {
+                document.getElementById('bookDetails').innerHTML = `<p class="text-danger">${book.error || 'Book not found.'}</p>`;
+            }
+        } catch (error) {
+            console.error('Error fetching book details:', error);
+            document.getElementById('bookDetails').innerHTML = '<p class="text-danger">Error fetching book details.</p>';
+        }
+    }
+
+    // Fetch book details on page load
+    window.onload = fetchBookDetails;
     </script>
 </body>
 </html>
