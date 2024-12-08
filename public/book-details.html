@@ -109,27 +109,40 @@
     </footer>
 
     <script>
-        // Check user authentication and toggle navbar links
+    // Check user authentication and toggle navbar links
+    fetch('/is-authenticated')
+        .then(res => res.json())
+        .then(data => {
+            const authLinks = document.getElementById('auth-links');
+            const publicLinks = document.getElementById('navbar-links');
+
+            if (data.authenticated) {
+                // Show authenticated links
+                authLinks.classList.remove('d-none');
+                document.getElementById('login-link').classList.add('d-none');
+                document.getElementById('register-link').classList.add('d-none');
+            } else {
+                // Show public links
+                authLinks.classList.add('d-none');
+                document.getElementById('login-link').classList.remove('d-none');
+                document.getElementById('register-link').classList.remove('d-none');
+            }
+        })
+        .catch(error => {
+            console.error("Error checking authentication:", error);
+        });
+
+        // Check if user is logged in, restrict access to the page
         fetch('/is-authenticated')
             .then(res => res.json())
             .then(data => {
-                const authLinks = document.getElementById('auth-links');
-                const publicLinks = document.getElementById('navbar-links');
-
-                if (data.authenticated) {
-                    // Show authenticated links
-                    authLinks.classList.remove('d-none');
-                    document.getElementById('login-link').classList.add('d-none');
-                    document.getElementById('register-link').classList.add('d-none');
-                } else {
-                    // Show public links
-                    authLinks.classList.add('d-none');
-                    document.getElementById('login-link').classList.remove('d-none');
-                    document.getElementById('register-link').classList.remove('d-none');
+                if (!data.authenticated) {
+                    alert('You must be logged in to access this page.');
+                    window.location.href = '/login.html';
                 }
             })
             .catch(error => {
-                console.error("Error checking authentication:", error);
+                console.error('Error checking authentication:', error);
             });
 
         // Toggle Add Book Form
@@ -260,7 +273,67 @@
             }
         }
 
-        // Fetch and display books on page load
+        // Fetch and display book details based on the book ID in the URL
+        async function fetchBookDetails() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookId = urlParams.get('id');
+
+            if (!bookId) {
+                document.getElementById('bookDetails').innerHTML = '<p class="text-danger">Book ID is missing.</p>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/books/${bookId}`);
+                const book = await response.json();
+
+                if (response.ok) {
+                    const detailsContainer = document.getElementById('bookDetails');
+                    detailsContainer.innerHTML = `
+                        <h2 class="mb-4">${book.title}</h2>
+                        <p><strong>Author:</strong> ${book.author}</p>
+                        <p><strong>Genre:</strong> ${book.genre}</p>
+                        <p><strong>Year:</strong> ${book.year}</p>
+                        <p><strong>ISBN:</strong> ${book.isbn}</p>
+                        <p><strong>Description:</strong> ${book.description}</p>
+                        <h4 class="mt-4">Available at the following libraries:</h4>
+                        <ul id="libraryList" class="list-group"></ul>
+                    `;
+
+                    // Fetch libraries with the book available
+                    fetchLibrariesWithBook(bookId);
+                } else {
+                    detailsContainer.innerHTML = `<p class="text-danger">${book.error || 'Book not found.'}</p>`;
+                }
+            } catch (error) {
+                console.error('Error fetching book details:', error);
+                document.getElementById('bookDetails').innerHTML = '<p class="text-danger">Error fetching book details.</p>';
+            }
+        }
+
+        // Fetch libraries that have the book available
+        async function fetchLibrariesWithBook(bookId) {
+            try {
+                const response = await fetch(`/libraries/with-book/${bookId}`);
+                const libraries = await response.json();
+                const libraryList = document.getElementById('libraryList');
+
+                if (libraries.length === 0) {
+                    libraryList.innerHTML = '<li class="list-group-item">No libraries currently have this book in stock.</li>';
+                    return;
+                }
+
+                libraries.forEach(library => {
+                    libraryList.innerHTML += `<li class="list-group-item">${library.name} - ${library.location}</li>`;
+                });
+            } catch (error) {
+                console.error('Error fetching libraries:', error);
+                document.getElementById('libraryList').innerHTML = '<li class="list-group-item text-danger">Error fetching library information.</li>';
+            }
+        }
+
+        // Fetch and display books + bookDetails on page load
+        window.onload = fetchBookDetails;
         window.onload = fetchBooks;
     </script>
 </body>

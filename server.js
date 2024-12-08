@@ -44,6 +44,31 @@ function isAuthenticated(req, res, next) {
     res.status(401).json({ error: 'Unauthorized access. Please log in.' });
 }
 
+// Middleware to check if user is admin
+function isAdmin(req, res, next) {
+    if (req.session.user && req.session.user.email === 'admin@gmail.com') {
+        return next();
+    }
+    res.status(403).json({ error: 'Forbidden. Admin access only.' });
+}
+
+// Admin account created if doesnt exist
+async function createAdminAccount() {
+    const db = client.db('library');
+    const users = db.collection('users');
+    const existingAdmin = await users.findOne({ email: 'admin@gmail.com' });
+
+    if (!existingAdmin) {
+        const hashedPassword = await bcrypt.hash('admin', 10);
+        await users.insertOne({ email: 'admin@gmail.com', password: hashedPassword });
+        console.log('Admin account created.');
+    } else {
+        console.log('Admin account already exists.');
+    }
+}
+
+createAdminAccount();
+
 // Protect the Profile Page
 app.get('/profile.html', (req, res) => {
     if (!req.session.user) {
@@ -116,6 +141,11 @@ app.post('/logout', (req, res) => {
     });
 });
 
+// Serve view-book.html
+app.get('/view-book.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'view-book.html'));
+});
+
 // Check if user is authenticated
 app.get('/is-authenticated', (req, res) => {
     res.json({ authenticated: !!req.session.user });
@@ -159,6 +189,25 @@ app.get('/books/:id', async (req, res) => {
         if (!book) {
             return res.status(404).json({ error: 'Book not found.' });
         }
+        res.json(book);
+    } catch (err) {
+        console.error('Error fetching book:', err);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+// Fetch a single book by ID
+app.get('/books/:id', async (req, res) => {
+    const bookId = req.params.id;
+
+    try {
+        const db = client.db('library');
+        const book = await db.collection('books').findOne({ _id: new ObjectId(bookId) });
+
+        if (!book) {
+            return res.status(404).json({ error: 'Book not found.' });
+        }
+
         res.json(book);
     } catch (err) {
         console.error('Error fetching book:', err);

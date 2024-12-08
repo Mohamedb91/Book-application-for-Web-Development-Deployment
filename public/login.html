@@ -42,28 +42,28 @@
 
     <script>
         document.getElementById('loginForm').addEventListener('submit', async function (event) {
-            event.preventDefault();
+        event.preventDefault();
 
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
 
-            try {
-                const response = await fetch('/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
+        try {
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
 
-                const result = await response.json();
-                if (response.ok) {
-                    alert(result.message);
-                    window.location.href = '/';
-                } else {
-                    alert(result.error || 'Login failed. Please try again.');
-                }
-            } catch (error) {
-                console.error("Error logging in:", error);
+            const result = await response.json();
+            if (response.ok) {
+                alert(result.message);
+                window.location.href = '/';
+            } else {
+                alert(result.error || 'Login failed. Please try again.');
             }
+        } catch (error) {
+            console.error("Error logging in:", error);
+        }
         });
     </script>
 </body>
