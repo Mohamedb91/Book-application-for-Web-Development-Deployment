@@ -84,7 +84,6 @@
                                     <label for="imageUrl" class="form-label">Image URL</label>
                                     <input type="text" id="imageUrl" name="imageUrl" class="form-control" placeholder="Enter image URL or fetch automatically" />
                                 </div>
-                                
                                 <div class="mb-3">
                                     <label for="description" class="form-label">Description</label>
                                     <textarea id="description" name="description" class="form-control" placeholder="Enter book description" required></textarea>
@@ -111,7 +110,7 @@
     </footer>
 
     <script>
-    // Check user authentication and toggle navbar links
+        // Check user authentication and toggle navbar links
         fetch('/is-authenticated')
         .then(res => res.json())
         .then(data => {
@@ -149,6 +148,38 @@
             const formContainer = document.getElementById('addBookFormContainer');
             formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
         });
+
+        // Toggle Add Book Form
+        document.getElementById('addBookForm').addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const title = document.getElementById('title').value.trim();
+        const author = document.getElementById('author').value.trim();
+        const year = document.getElementById('year').value.trim();
+        const isbn = document.getElementById('isbn').value.trim();
+        const imageUrl = document.getElementById('imageUrl').value.trim();
+        const description = document.getElementById('description').value.trim();
+
+        try {
+            const response = await fetch('/books', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, author, year, isbn, imageUrl, description }),
+            });
+
+            if (response.ok) {
+                alert('Book added successfully!');
+                document.getElementById('addBookFormContainer').style.display = 'none';
+                fetchBooks(); // Refresh the book list
+            } else {
+                alert('Failed to add book.');
+            }
+        } catch (error) {
+            console.error('Error adding book:', error);
+            alert('An error occurred while adding the book.');
+        }
+        });
+
 
         // Handle Add Book Form Submission
         document.getElementById('fetchBookData').addEventListener('click', async () => {
@@ -188,7 +219,7 @@
             console.error('Error fetching book data:', error);
             alert('An error occurred while fetching book data. Please try again later.');
         }
-    });
+        });
 
 
         // Fetch and Display Books
@@ -209,7 +240,6 @@
                                 <div class="p-4 text-center">
                                     <h4>${book.title}</h4>
                                     <p><strong>Author:</strong> ${book.author}</p>
-                                    <p><strong>Genre:</strong> ${book.genre}</p>
                                     <p><strong>Year:</strong> ${book.year}</p>
                                     <p><strong>ISBN:</strong> ${book.isbn}</p>
                                     <p>${book.description}</p>
@@ -237,7 +267,6 @@
 
                 const updatedTitle = prompt('Edit Title:', book.title) || book.title;
                 const updatedAuthor = prompt('Edit Author:', book.author) || book.author;
-                const updatedGenre = prompt('Edit Genre:', book.genre) || book.genre;
                 const updatedYear = prompt('Edit Year:', book.year) || book.year;
                 const updatedISBN = prompt('Edit ISBN:', book.isbn) || book.isbn;
                 const updatedDescription = prompt('Edit Description:', book.description) || book.description;
@@ -249,7 +278,6 @@
                     body: JSON.stringify({
                         title: updatedTitle,
                         author: updatedAuthor,
-                        genre: updatedGenre,
                         year: updatedYear,
                         isbn: updatedISBN,
                         description: updatedDescription,
@@ -305,7 +333,6 @@
                     detailsContainer.innerHTML = `
                         <h2 class="mb-4">${book.title}</h2>
                         <p><strong>Author:</strong> ${book.author}</p>
-                        <p><strong>Genre:</strong> ${book.genre}</p>
                         <p><strong>Year:</strong> ${book.year}</p>
                         <p><strong>ISBN:</strong> ${book.isbn}</p>
                         <p><strong>Description:</strong> ${book.description}</p>

@@ -158,13 +158,14 @@ app.post('/books', isAdmin, async (req, res) => {
     try {
         const db = client.db('library');
         const books = db.collection('books');
-        const result = await books.insertOne({ title, author, genre, year, isbn, description, imageUrl });
+        const result = await books.insertOne({ title, author, year, isbn, description, imageUrl });
         res.json({ success: true, message: 'Book added successfully.', bookId: result.insertedId });
     } catch (err) {
         console.error('Error adding book:', err);
         res.status(500).json({ error: 'Internal server error.' });
     }
 });
+
 
 // Fetch all books
 app.get('/books', async (req, res) => {
@@ -196,36 +197,17 @@ app.get('/books/:id', async (req, res) => {
     }
 });
 
-// Fetch a single book by ID
-app.get('/books/:id', async (req, res) => {
-    const bookId = req.params.id;
-
-    try {
-        const db = client.db('library');
-        const book = await db.collection('books').findOne({ _id: new ObjectId(bookId) });
-
-        if (!book) {
-            return res.status(404).json({ error: 'Book not found.' });
-        }
-
-        res.json(book);
-    } catch (err) {
-        console.error('Error fetching book:', err);
-        res.status(500).json({ error: 'Internal server error.' });
-    }
-});
-
 // Edit a book
 app.put('/books/:id', isAdmin, async (req, res) => {
     const bookId = req.params.id;
-    const { title, author, genre, year, isbn, description } = req.body;
+    const { title, author, year, isbn, description } = req.body;
 
     try {
         const db = client.db('library');
         const books = db.collection('books');
         const result = await books.updateOne(
             { _id: new ObjectId(bookId) },
-            { $set: { title, author, genre, year, isbn, description } }
+            { $set: { title, author, year, isbn, description } }
         );
 
         if (result.matchedCount === 0) {
