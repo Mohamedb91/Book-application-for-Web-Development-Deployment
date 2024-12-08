@@ -152,7 +152,7 @@ app.get('/is-authenticated', (req, res) => {
 });
 
 // Add a book
-app.post('/books', isAuthenticated, async (req, res) => {
+app.post('/books', isAdmin, async (req, res) => {
     const { title, author, genre, year, isbn, description } = req.body;
 
     try {
@@ -216,7 +216,7 @@ app.get('/books/:id', async (req, res) => {
 });
 
 // Edit a book
-app.put('/books/:id', isAuthenticated, async (req, res) => {
+app.put('/books/:id', isAdmin, async (req, res) => {
     const bookId = req.params.id;
     const { title, author, genre, year, isbn, description } = req.body;
 
@@ -240,7 +240,7 @@ app.put('/books/:id', isAuthenticated, async (req, res) => {
 });
 
 // Delete a book
-app.delete('/books/:id', isAuthenticated, async (req, res) => {
+app.delete('/books/:id', isAdmin, async (req, res) => {
     const bookId = req.params.id;
 
     try {
